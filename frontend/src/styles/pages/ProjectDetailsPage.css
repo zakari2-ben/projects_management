@@ -1,0 +1,116 @@
+.project-details-page__main {
+  margin: 0 auto;
+  max-width: 80rem;
+  padding: 1.5rem 1rem;
+}
+
+.project-details-page__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.project-details-page__description {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.project-details-page__invite {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.project-details-page__create-task {
+  margin-top: 1.5rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.project-details-page__section-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.project-details-page__form {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.project-details-page__input,
+.project-details-page__textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+}
+
+.project-details-page__submit {
+  width: fit-content;
+  border: 0;
+  border-radius: 0.375rem;
+  background: #2563eb;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+.project-details-page__columns {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.project-details-page__column {
+  border-radius: 0.75rem;
+  background: #e2e8f0;
+  padding: 0.75rem;
+}
+
+.project-details-page__column-title {
+  margin: 0 0 0.75rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.project-details-page__task-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.project-details-page__move-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.project-details-page__move-button {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.25rem;
+  background: #fff;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .project-details-page__form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .project-details-page__textarea {
+    grid-column: span 2;
+  }
+
+  .project-details-page__columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+

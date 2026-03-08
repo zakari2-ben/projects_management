@@ -1,10 +1,12 @@
 import { api } from "./axios";
 async function getTasks(projectId) {
   const { data } = await api.get(`/projects/${projectId}/tasks`);
+  // List endpoints return payload inside data.data.
   return data.data;
 }
 async function getTask(projectId, taskId) {
   const { data } = await api.get(`/projects/${projectId}/tasks/${taskId}`);
+  // Details endpoint returns the task object directly.
   return data;
 }
 async function createTask(projectId, payload) {

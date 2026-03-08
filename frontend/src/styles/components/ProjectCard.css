@@ -1,0 +1,39 @@
+.project-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 1rem;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+}
+
+.project-card__title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.project-card__description {
+  margin: 0.5rem 0 0;
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+.project-card__invite {
+  margin-top: 0.75rem;
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.project-card__link {
+  margin-top: 1rem;
+  display: inline-block;
+  border-radius: 0.375rem;
+  background: #2563eb;
+  color: #fff;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+

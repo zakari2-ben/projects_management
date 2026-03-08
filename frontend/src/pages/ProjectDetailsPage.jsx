@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar'
 import TaskCard from '../components/TaskCard'
 import * as projectsApi from '../api/projects.api'
 import * as tasksApi from '../api/tasks.api'
+import '../styles/pages/ProjectDetailsPage.css'
 
 const columns = [
   { key: 'todo', title: 'To Do' },
@@ -23,6 +24,7 @@ export default function ProjectDetailsPage() {
   const [dueDate, setDueDate] = useState('')
   const [assignedUserId, setAssignedUserId] = useState('')
 
+  // Derive kanban columns from one source of truth (tasks state).
   const groupedTasks = useMemo(
     () => ({
       todo: tasks.filter((task) => task.status === 'todo'),
@@ -35,6 +37,7 @@ export default function ProjectDetailsPage() {
   useEffect(() => {
     const load = async () => {
       try {
+        // Load all required project data in parallel to reduce waiting time.
         const [projectData, memberData, taskData] = await Promise.all([
           projectsApi.getProject(id),
           projectsApi.getProjectMembers(id),
@@ -58,8 +61,10 @@ export default function ProjectDetailsPage() {
         name,
         description,
         due_date: dueDate || undefined,
+        // API expects number|null, while <select> gives us a string.
         assigned_user_id: assignedUserId ? Number(assignedUserId) : null,
       })
+      // Insert immediately in local state to avoid a full re-fetch.
       setTasks((prev) => [newTask, ...prev])
       setName('')
       setDescription('')
@@ -74,6 +79,7 @@ export default function ProjectDetailsPage() {
   const quickMove = async (task, status) => {
     try {
       const updated = await tasksApi.updateTaskStatus(id, task.id, status)
+      // Replace only the moved task, keep all others unchanged.
       setTasks((prev) => prev.map((item) => (item.id === task.id ? updated : item)))
     } catch {
       toast.error('Could not update task status')
@@ -81,64 +87,66 @@ export default function ProjectDetailsPage() {
   }
 
   return (
-    <div>
+    <div className="project-details-page">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-6">
-        <h1 className="text-2xl font-bold">{project?.name || 'Project'}</h1>
-        <p className="mt-1 text-sm text-slate-600">{project?.description || 'No description'}</p>
-        <p className="mt-1 text-xs text-slate-500">Invite code: {project?.invite_code}</p>
+      <main className="project-details-page__main">
+        <h1 className="project-details-page__title">{project?.name || 'Project'}</h1>
+        <p className="project-details-page__description">{project?.description || 'No description'}</p>
+        <p className="project-details-page__invite">Invite code: {project?.invite_code}</p>
 
-        <section className="mt-6 rounded-xl bg-white p-4 shadow">
-          <h2 className="text-lg font-semibold">Create task</h2>
-          <form onSubmit={handleCreateTask} className="mt-3 grid gap-3 md:grid-cols-2">
+        <section className="project-details-page__create-task">
+          <h2 className="project-details-page__section-title">Create task</h2>
+          <form onSubmit={handleCreateTask} className="project-details-page__form">
             <input
               type="text"
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="Task name"
-              className="rounded-md border border-slate-300 px-3 py-2"
+              className="project-details-page__input"
               required
             />
             <input
               type="date"
               value={dueDate}
               onChange={(event) => setDueDate(event.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2"
+              className="project-details-page__input"
             />
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               placeholder="Description"
-              className="rounded-md border border-slate-300 px-3 py-2 md:col-span-2"
+              className="project-details-page__textarea"
               rows={3}
             />
             <select
               value={assignedUserId}
               onChange={(event) => setAssignedUserId(event.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2"
+              className="project-details-page__input"
             >
-              <option value="">Unassigned</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              ))}
+              <option value ="">Unassigned</option>
+                {members.map((member) => (
+                  <option key = {member.id} value = {member.id}>
+                    {member.name} ({member.email})
+                  </option>
+                ))}
+
+              
             </select>
-            <button type="submit" className="rounded-md bg-blue-600 px-3 py-2 text-white">
+            <button type="submit" className="project-details-page__submit">
               Create task
             </button>
           </form>
         </section>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-3">
+        <section className="project-details-page__columns">
           {columns.map((column) => (
-            <div key={column.key} className="rounded-xl bg-slate-100 p-3">
-              <h3 className="mb-3 font-semibold text-slate-900">{column.title}</h3>
-              <div className="space-y-3">
+            <div key={column.key} className="project-details-page__column">
+              <h3 className="project-details-page__column-title">{column.title}</h3>
+              <div className="project-details-page__task-list">
                 {groupedTasks[column.key].map((task) => (
                   <div key={task.id}>
                     <TaskCard projectId={id} task={task} />
-                    <div className="mt-2 flex gap-1">
+                    <div className="project-details-page__move-actions">
                       {columns
                         .filter((item) => item.key !== task.status)
                         .map((target) => (
@@ -146,7 +154,7 @@ export default function ProjectDetailsPage() {
                             key={target.key}
                             type="button"
                             onClick={() => void quickMove(task, target.key)}
-                            className="rounded border border-slate-300 bg-white px-2 py-1 text-xs"
+                            className="project-details-page__move-button"
                           >
                             Move to {target.title}
                           </button>

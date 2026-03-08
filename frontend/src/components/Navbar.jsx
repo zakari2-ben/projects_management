@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import '../styles/components/Navbar.css'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -11,23 +12,19 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-4">
-          <Link to="/dashboard" className="font-semibold text-slate-900">
+    <nav className="navbar">
+      <div className="navbar__container">
+        <div className="navbar__left">
+          <Link to="/dashboard" className="navbar__brand">
             PM App
           </Link>
-          <Link to="/projects" className="text-sm text-slate-600">
+          <Link to="/projects" className="navbar__link">
             Projects
           </Link>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-500">{user?.name}</span>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-sm text-white"
-          >
+        <div className="navbar__right">
+          <span className="navbar__user">{user?.name}</span>
+          <button type="button" onClick={handleLogout} className="navbar__logout">
             Logout
           </button>
         </div>

@@ -1,0 +1,34 @@
+.task-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 0.75rem;
+}
+
+.task-card__title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.task-card__description {
+  margin: 0.25rem 0 0;
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+.task-card__meta {
+  margin-top: 0.5rem;
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.task-card__link {
+  margin-top: 0.75rem;
+  display: inline-block;
+  color: #2563eb;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}

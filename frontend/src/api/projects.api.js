@@ -1,6 +1,7 @@
 import { api } from "./axios";
 async function getProjects() {
   const { data } = await api.get("/projects");
+  // Keep this adapter to hide backend response shape from pages/components.
   return data.data;
 }
 async function getProject(projectId) {
