@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import * as authApi from '../api/auth.api'
 
 const AuthContext = createContext(undefined)
@@ -7,7 +7,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
+    setLoading(true)
     try {
       const profile = await authApi.me()
       setUser(profile)
@@ -16,11 +17,11 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     void refreshUser()
-  }, [])
+  }, [refreshUser])
 
   const value = useMemo(
     () => ({
@@ -46,7 +47,7 @@ export function AuthProvider({ children }) {
       },
       refreshUser,
     }),
-    [loading, user],
+    [loading, refreshUser, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
