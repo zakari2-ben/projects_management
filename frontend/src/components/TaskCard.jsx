@@ -7,7 +7,7 @@ import {
 } from '../utils/taskFields'
 import '../styles/components/TaskCard.css'
 
-export default function TaskCard({ projectId, task, onDelete }) {
+export default function TaskCard({ projectId, task, onDelete, onOpenComments, commentsCount = 0 }) {
   const navigate = useNavigate()
 
   const plainDescription = (task.description || '')
@@ -49,6 +49,7 @@ export default function TaskCard({ projectId, task, onDelete }) {
         <span className="task-card__meta-item">
           Dependencies: {Array.isArray(task.dependency_ids) ? task.dependency_ids.length : 0}
         </span>
+        <span className="task-card__meta-item">Comments: {commentsCount}</span>
       </div>
 
       <div className="task-card__progress">
@@ -74,6 +75,18 @@ export default function TaskCard({ projectId, task, onDelete }) {
             <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
           </svg>
         </Link>
+
+        <button
+          type="button"
+          className="task-card__icon-button"
+          title="Open comments"
+          aria-label="Open comments"
+          onClick={() => onOpenComments?.(task)}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4.8 3.6A.75.75 0 0 1 3 20V5a1 1 0 0 1 1-1Zm1 2v12l3.4-2.55A1 1 0 0 1 9 15h10V6H5Zm3 3h8v2H8V9Zm0 4h5v2H8v-2Z" />
+          </svg>
+        </button>
 
         <button
           type="button"
