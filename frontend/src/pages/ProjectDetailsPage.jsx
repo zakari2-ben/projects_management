@@ -10,6 +10,8 @@ import { TextStyle } from '@tiptap/extension-text-style'
 import FontFamily from '@tiptap/extension-font-family'
 import Navbar from '../components/Navbar'
 import TaskCard from '../components/TaskCard'
+import ProjectCollaborationPanel from '../components/ProjectCollaborationPanel'
+import { useAuth } from '../context/AuthContext'
 import * as projectsApi from '../api/projects.api'
 import * as tasksApi from '../api/tasks.api'
 import {
@@ -28,6 +30,7 @@ const columns = [
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams()
+  const { user } = useAuth()
   const id = Number(projectId)
   const [project, setProject] = useState(null)
   const [members, setMembers] = useState([])
@@ -42,6 +45,9 @@ export default function ProjectDetailsPage() {
   const [selectedDependencyIds, setSelectedDependencyIds] = useState([])
   const [subtasks, setSubtasks] = useState([])
   const [editorFontFamily, setEditorFontFamily] = useState('Segoe UI')
+  const [collabEvents, setCollabEvents] = useState([])
+  const [selectedCommentTaskId, setSelectedCommentTaskId] = useState('')
+  const [taskCommentCounts, setTaskCommentCounts] = useState({})
 
   const editor = useEditor({
     extensions: [
@@ -83,6 +89,51 @@ export default function ProjectDetailsPage() {
     [tasks],
   )
 
+  const currentUser = user || {
+    id: 'guest',
+    name: 'Guest User',
+    email: 'guest@local',
+  }
+
+  const buildEventNotifications = (targets, title, message, taskId) =>
+    [...new Set(targets.map((target) => String(target)).filter(Boolean))]
+      .filter((target) => target !== String(currentUser.id))
+      .flatMap((recipientId) => [
+        {
+          id: `${Date.now()}-${recipientId}-inapp`,
+          recipientId,
+          channel: 'in_app',
+          title,
+          message,
+          taskId,
+          createdAt: new Date().toISOString(),
+          readAt: null,
+        },
+        {
+          id: `${Date.now()}-${recipientId}-email`,
+          recipientId,
+          channel: 'email',
+          title,
+          message,
+          taskId,
+          createdAt: new Date().toISOString(),
+          readAt: null,
+          status: 'queued',
+          sentAt: null,
+        },
+      ])
+
+  const pushCollabEvent = (event) => {
+    setCollabEvents((prev) => [
+      {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        createdAt: new Date().toISOString(),
+        ...event,
+      },
+      ...prev,
+    ])
+  }
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -101,6 +152,13 @@ export default function ProjectDetailsPage() {
 
     void load()
   }, [id])
+
+  const effectiveSelectedCommentTaskId = useMemo(() => {
+    if (tasks.length === 0) return ''
+
+    const exists = tasks.some((task) => String(task.id) === String(selectedCommentTaskId))
+    return exists ? String(selectedCommentTaskId) : String(tasks[0].id)
+  }, [selectedCommentTaskId, tasks])
 
   const handleCreateTask = async (event) => {
     event.preventDefault()
@@ -137,7 +195,18 @@ export default function ProjectDetailsPage() {
       editor?.commands.clearContent()
       editor?.commands.setFontFamily('Segoe UI')
       setEditorFontFamily('Segoe UI')
+      setSelectedCommentTaskId(String(newTask.id))
       toast.success('Task created')
+
+      pushCollabEvent({
+        message: `${currentUser.name} created task "${newTask.name}"`,
+        notifications: buildEventNotifications(
+          [newTask.assignee?.id],
+          'New task assigned',
+          `You were assigned to "${newTask.name}"`,
+          newTask.id,
+        ),
+      })
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Could not create task')
     }
@@ -147,6 +216,16 @@ export default function ProjectDetailsPage() {
     try {
       const updated = await tasksApi.updateTaskStatus(id, task.id, status)
       setTasks((prev) => prev.map((item) => (item.id === task.id ? updated : item)))
+
+      pushCollabEvent({
+        message: `${currentUser.name} moved "${updated.name}" to ${status.replace('_', ' ')}`,
+        notifications: buildEventNotifications(
+          [updated.assignee?.id],
+          'Task status updated',
+          `"${updated.name}" moved to ${status.replace('_', ' ')}`,
+          updated.id,
+        ),
+      })
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Could not move task')
     }
@@ -160,6 +239,16 @@ export default function ProjectDetailsPage() {
       await tasksApi.deleteTask(id, task.id)
       setTasks((prev) => prev.filter((item) => item.id !== task.id))
       toast.success('Task deleted')
+
+      pushCollabEvent({
+        message: `${currentUser.name} deleted "${task.name}"`,
+        notifications: buildEventNotifications(
+          members.map((member) => member.id),
+          'Task deleted',
+          `"${task.name}" was deleted`,
+          task.id,
+        ),
+      })
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Could not delete task')
     }
@@ -473,7 +562,13 @@ export default function ProjectDetailsPage() {
               <div className="project-details-page__task-list">
                 {groupedTasks[column.key].map((task) => (
                   <div key={task.id}>
-                    <TaskCard projectId={id} task={task} onDelete={handleDeleteTask} />
+                    <TaskCard
+                      projectId={id}
+                      task={task}
+                      onDelete={handleDeleteTask}
+                      commentsCount={taskCommentCounts[String(task.id)] || 0}
+                      onOpenComments={(selectedTask) => setSelectedCommentTaskId(String(selectedTask.id))}
+                    />
                     <div className="project-details-page__move-actions">
                       {columns
                         .filter((item) => item.key !== task.status)
@@ -494,6 +589,17 @@ export default function ProjectDetailsPage() {
             </div>
           ))}
         </section>
+
+        <ProjectCollaborationPanel
+          projectId={id}
+          tasks={tasks}
+          members={members}
+          currentUser={currentUser}
+          events={collabEvents}
+          selectedTaskId={effectiveSelectedCommentTaskId}
+          onSelectedTaskChange={setSelectedCommentTaskId}
+          onCommentsCountChange={setTaskCommentCounts}
+        />
       </main>
     </div>
   )
