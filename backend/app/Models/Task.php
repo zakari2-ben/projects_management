@@ -21,12 +21,29 @@ class Task extends Model
         self::STATUS_DONE,
     ];
 
+    public const PRIORITY_LOW = 'low';
+    public const PRIORITY_MEDIUM = 'medium';
+    public const PRIORITY_HIGH = 'high';
+    public const PRIORITY_CRITICAL = 'critical';
+
+    public const PRIORITIES = [
+        self::PRIORITY_LOW,
+        self::PRIORITY_MEDIUM,
+        self::PRIORITY_HIGH,
+        self::PRIORITY_CRITICAL,
+    ];
+
     protected $fillable = [
         'project_id',
         'name',
         'description',
         'status',
+        'priority',
+        'labels',
+        'subtasks',
+        'start_date',
         'due_date',
+        'dependency_ids',
         'assigned_user_id',
         'created_by',
     ];
@@ -34,7 +51,11 @@ class Task extends Model
     protected function casts(): array
     {
         return [
+            'labels' => 'array',
+            'subtasks' => 'array',
+            'start_date' => 'date',
             'due_date' => 'date',
+            'dependency_ids' => 'array',
         ];
     }
 
