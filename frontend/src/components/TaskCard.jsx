@@ -1,4 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  getStatusLabel,
+  getSubtaskProgress,
+  normalizeLabels,
+  PRIORITY_LABELS,
+} from '../utils/taskFields'
 import '../styles/components/TaskCard.css'
 
 export default function TaskCard({ projectId, task, onDelete }) {
@@ -9,8 +15,11 @@ export default function TaskCard({ projectId, task, onDelete }) {
     .replace(/\s+/g, ' ')
     .trim()
 
-  const statusLabel =
-    task.status === 'in_progress' ? 'In Progress' : task.status === 'done' ? 'Done' : 'To Do'
+  const statusLabel = getStatusLabel(task.status)
+  const priorityValue = task.priority || 'medium'
+  const priorityLabel = PRIORITY_LABELS[priorityValue] || PRIORITY_LABELS.medium
+  const labels = normalizeLabels(task.labels)
+  const subtaskProgress = getSubtaskProgress(task.subtasks)
 
   return (
     <div className="task-card">
@@ -21,9 +30,37 @@ export default function TaskCard({ projectId, task, onDelete }) {
 
       <p className="task-card__description">{plainDescription || 'No description'}</p>
 
+      <div className="task-card__chips">
+        <span className={`task-card__chip task-card__chip--priority-${priorityValue}`}>
+          Priority: {priorityLabel}
+        </span>
+        {labels.slice(0, 3).map((label) => (
+          <span key={label} className="task-card__chip task-card__chip--label">
+            #{label}
+          </span>
+        ))}
+        {labels.length > 3 && <span className="task-card__chip task-card__chip--label">+{labels.length - 3}</span>}
+      </div>
+
       <div className="task-card__meta">
+        <span className="task-card__meta-item">Start: {task.start_date || 'N/A'}</span>
         <span className="task-card__meta-item">Due: {task.due_date || 'N/A'}</span>
         <span className="task-card__meta-item">Assignee: {task.assignee?.name || 'Unassigned'}</span>
+        <span className="task-card__meta-item">
+          Dependencies: {Array.isArray(task.dependency_ids) ? task.dependency_ids.length : 0}
+        </span>
+      </div>
+
+      <div className="task-card__progress">
+        <div className="task-card__progress-head">
+          <span>Subtasks</span>
+          <span>
+            {subtaskProgress.done}/{subtaskProgress.total}
+          </span>
+        </div>
+        <div className="task-card__progress-track" role="progressbar" aria-valuenow={subtaskProgress.percent}>
+          <span className="task-card__progress-fill" style={{ width: `${subtaskProgress.percent}%` }} />
+        </div>
       </div>
 
       <div className="task-card__actions">
