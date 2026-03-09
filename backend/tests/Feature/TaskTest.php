@@ -43,7 +43,7 @@ class TaskTest extends TestCase
             'status' => TaskStatus::InProgress->value,
         ]);
 
-        $response->assertOk()->assertJsonPath('task.status', Task::STATUS_IN_PROGRESS);
+        $response->assertOk()->assertJsonPath('task.status', TaskStatus::InProgress->value);
     }
 
     public function test_cannot_assign_task_to_non_member(): void
@@ -84,5 +84,32 @@ class TaskTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+    }
+
+    public function test_member_can_filter_tasks_by_status(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['created_by' => $owner->id]);
+        $project->members()->attach($owner->id);
+
+        Task::factory()->create([
+            'project_id' => $project->id,
+            'created_by' => $owner->id,
+            'name' => 'Backlog',
+            'status' => TaskStatus::Todo->value,
+        ]);
+        Task::factory()->create([
+            'project_id' => $project->id,
+            'created_by' => $owner->id,
+            'name' => 'In progress task',
+            'status' => TaskStatus::InProgress->value,
+        ]);
+
+        $response = $this->actingAs($owner)->getJson("/api/projects/{$project->id}/tasks?status=todo");
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.status', TaskStatus::Todo->value)
+            ->assertJsonPath('data.0.name', 'Backlog');
     }
 }
