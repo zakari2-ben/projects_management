@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests\Task;
 
-use App\Models\Task;
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -26,8 +27,8 @@ class UpdateTaskRequest extends FormRequest
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'status' => ['sometimes', 'required', 'in:'.implode(',', Task::STATUSES)],
-            'priority' => ['sometimes', 'required', Rule::in(Task::PRIORITIES)],
+            'status' => ['sometimes', 'required', Rule::enum(TaskStatus::class)],
+            'priority' => ['sometimes', 'required', Rule::enum(TaskPriority::class)],
             'labels' => ['nullable', 'array'],
             'labels.*' => ['required', 'string', 'max:40'],
             'subtasks' => ['nullable', 'array'],

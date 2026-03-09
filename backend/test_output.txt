@@ -1,0 +1,96 @@
+﻿
+   PASS  Tests\Unit\ExampleTest
+  Ô£ô that true is true
+
+   PASS  Tests\Feature\AuthTest
+  Ô£ô user can reÔÇª 0.36s  
+  Ô£ô user can loÔÇª 0.04s  
+  Ô£ô authenticatÔÇª 0.02s  
+
+   PASS  Tests\Feature\ExampleTest
+  Ô£ô the applicaÔÇª 0.03s  
+
+   PASS  Tests\Feature\ProjectTest
+  Ô£ô member canÔÇª  0.03s  
+  Ô£ô user can crÔÇª 0.02s  
+  Ô£ô user can joÔÇª 0.02s  
+
+   FAIL  Tests\Feature\TaskTest
+  Ô¿» member canÔÇª  0.04s  
+  Ô¿» member canÔÇª  0.02s  
+  Ô¿» cannot assiÔÇª 0.02s  
+  Ô¿» task dependÔÇª 0.02s  
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  TeÔÇª  Error   
+  Undefined constant App\Models\Task::STATUS_TODO
+
+  at tests\Feature\TaskTest.php:23
+     19Ôûò         $project->members()->attach($user->id);
+     20Ôûò 
+     21Ôûò         $response = $this->actingAs($user)->postJson("/api/projects/{$project->id}/tasks", [
+     22Ôûò             'name' => 'Create API docs',
+  Ô×£  23Ôûò             'status' => Task::STATUS_TODO,
+     24Ôûò         ]);
+     25Ôûò 
+     26Ôûò         $response->assertCreated()
+     27Ôûò             ->assertJsonPath('task.name', 'Create API docs');
+
+  1   tests\Feature\TaskTest.php:23
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  TeÔÇª  Error   
+  Undefined constant App\Models\Task::STATUS_TODO
+
+  at tests\Feature\TaskTest.php:38
+     34Ôûò         $project->members()->attach($owner->id);
+     35Ôûò         $task = Task::factory()->create([
+     36Ôûò             'project_id' => $project->id,
+     37Ôûò             'created_by' => $owner->id,
+  Ô×£  38Ôûò             'status' => Task::STATUS_TODO,
+     39Ôûò         ]);
+     40Ôûò 
+     41Ôûò         $response = $this->actingAs($owner)->patchJson("/api/projects/{$project->id}/tasks/{$task->id}/status", [
+     42Ôûò             'status' => Task::STATUS_IN_PROGRESS,
+
+  1   tests\Feature\TaskTest.php:38
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  TeÔÇª  Error   
+  Undefined constant App\Models\Task::STATUSES
+
+  at database\factories\TaskFactory.php:26
+     22Ôûò         return [
+     23Ôûò             'project_id' => Project::factory(),
+     24Ôûò             'name' => fake()->sentence(4),
+     25Ôûò             'description' => fake()->optional()->paragraph(),
+  Ô×£  26Ôûò             'status' => fake()->randomElement(Task::STATUSES),
+     27Ôûò             'priority' => fake()->randomElement(Task::PRIORITIES),
+     28Ôûò             'labels' => [],
+     29Ôûò             'subtasks' => [],
+     30Ôûò             'start_date' => fake()->optional()->date(),
+
+  1   database\factories\TaskFactory.php:26
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:550
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  TeÔÇª  Error   
+  Undefined constant App\Models\Task::STATUSES
+
+  at database\factories\TaskFactory.php:26
+     22Ôûò         return [
+     23Ôûò             'project_id' => Project::factory(),
+     24Ôûò             'name' => fake()->sentence(4),
+     25Ôûò             'description' => fake()->optional()->paragraph(),
+  Ô×£  26Ôûò             'status' => fake()->randomElement(Task::STATUSES),
+     27Ôûò             'priority' => fake()->randomElement(Task::PRIORITIES),
+     28Ôûò             'labels' => [],
+     29Ôûò             'subtasks' => [],
+     30Ôûò             'start_date' => fake()->optional()->date(),
+
+  1   database\factories\TaskFactory.php:26
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:550
+
+
+  Tests:    4 failed, 8 passed (18 assertions)
+  Duration: 0.77s
+

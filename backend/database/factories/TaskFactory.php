@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -23,8 +25,8 @@ class TaskFactory extends Factory
             'project_id' => Project::factory(),
             'name' => fake()->sentence(4),
             'description' => fake()->optional()->paragraph(),
-            'status' => fake()->randomElement(Task::STATUSES),
-            'priority' => fake()->randomElement(Task::PRIORITIES),
+            'status' => fake()->randomElement(TaskStatus::values()),
+            'priority' => fake()->randomElement(TaskPriority::values()),
             'labels' => [],
             'subtasks' => [],
             'start_date' => fake()->optional()->date(),

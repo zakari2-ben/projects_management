@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests\Task;
 
-use App\Models\Task;
+use App\Enums\TaskStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTaskStatusRequest extends FormRequest
 {
@@ -23,7 +24,7 @@ class UpdateTaskStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'in:'.implode(',', Task::STATUSES)],
+            'status' => ['required', Rule::enum(TaskStatus::class)],
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -20,7 +21,7 @@ class TaskTest extends TestCase
 
         $response = $this->actingAs($user)->postJson("/api/projects/{$project->id}/tasks", [
             'name' => 'Create API docs',
-            'status' => Task::STATUS_TODO,
+            'status' => TaskStatus::Todo->value,
         ]);
 
         $response->assertCreated()
@@ -35,11 +36,11 @@ class TaskTest extends TestCase
         $task = Task::factory()->create([
             'project_id' => $project->id,
             'created_by' => $owner->id,
-            'status' => Task::STATUS_TODO,
+            'status' => TaskStatus::Todo->value,
         ]);
 
         $response = $this->actingAs($owner)->patchJson("/api/projects/{$project->id}/tasks/{$task->id}/status", [
-            'status' => Task::STATUS_IN_PROGRESS,
+            'status' => TaskStatus::InProgress->value,
         ]);
 
         $response->assertOk()->assertJsonPath('task.status', Task::STATUS_IN_PROGRESS);

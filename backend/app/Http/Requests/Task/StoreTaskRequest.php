@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests\Task;
 
-use App\Models\Task;
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -26,8 +27,8 @@ class StoreTaskRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'status' => ['nullable', 'in:'.implode(',', Task::STATUSES)],
-            'priority' => ['nullable', Rule::in(Task::PRIORITIES)],
+            'status' => ['nullable', Rule::enum(TaskStatus::class)],
+            'priority' => ['nullable', Rule::enum(TaskPriority::class)],
             'labels' => ['nullable', 'array'],
             'labels.*' => ['required', 'string', 'max:40'],
             'subtasks' => ['nullable', 'array'],
