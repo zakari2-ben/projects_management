@@ -21,6 +21,8 @@ import {
   PRIORITY_LABELS,
   PRIORITY_OPTIONS,
 } from '../utils/taskFields'
+import { getApiErrorDetails } from '../utils/http'
+import { sanitizeHtml } from '../utils/sanitizeHtml'
 import '../styles/pages/TaskDetailsPage.css'
 
 const statuses = [
@@ -106,7 +108,7 @@ export default function TaskDetailsPage() {
           setEditorFontFamily('Segoe UI')
         }
       } catch (error) {
-        toast.error(error?.response?.data?.message || 'Could not load task')
+        toast.error(getApiErrorDetails(error, 'Could not load task').message)
       }
     }
 
@@ -168,7 +170,7 @@ export default function TaskDetailsPage() {
       setIsEditing(false)
       toast.success('Task updated')
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Could not update task')
+      toast.error(getApiErrorDetails(error, 'Could not update task').message)
     }
   }
 
@@ -178,8 +180,8 @@ export default function TaskDetailsPage() {
       await tasksApi.deleteTask(projectIdNumber, task.id)
       toast.success('Task deleted')
       navigate(`/projects/${projectIdNumber}`)
-    } catch {
-      toast.error('Could not delete task')
+    } catch (error) {
+      toast.error(getApiErrorDetails(error, 'Could not delete task').message)
     }
   }
 
@@ -262,6 +264,7 @@ export default function TaskDetailsPage() {
 
   const dueInfo = getDueInfo()
   const createdAtLabel = task?.created_at ? new Date(task.created_at).toLocaleDateString() : 'N/A'
+  const safeDescription = useMemo(() => sanitizeHtml(task?.description || ''), [task?.description])
 
   return (
     <div className="task-details-page">
@@ -386,8 +389,8 @@ export default function TaskDetailsPage() {
                 </ul>
 
                 <div className="task-details-page__content">
-                  {task?.description ? (
-                    <div dangerouslySetInnerHTML={{ __html: task.description }} />
+                  {safeDescription ? (
+                    <div dangerouslySetInnerHTML={{ __html: safeDescription }} />
                   ) : (
                     <p>No description</p>
                   )}

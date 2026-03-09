@@ -8,16 +8,19 @@ import Image from '@tiptap/extension-image'
 import Underline from '@tiptap/extension-underline'
 import { TextStyle } from '@tiptap/extension-text-style'
 import FontFamily from '@tiptap/extension-font-family'
+import KpiCard from '../components/KpiCard'
 import Navbar from '../components/Navbar'
 import TaskCard from '../components/TaskCard'
 import * as projectsApi from '../api/projects.api'
 import * as tasksApi from '../api/tasks.api'
+import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import {
   normalizeDependencyIds,
   normalizeSubtasks,
   parseLabelsInput,
   PRIORITY_OPTIONS,
 } from '../utils/taskFields'
+import { getApiErrorDetails } from '../utils/http'
 import '../styles/pages/ProjectDetailsPage.css'
 
 const columns = [
@@ -42,6 +45,11 @@ export default function ProjectDetailsPage() {
   const [selectedDependencyIds, setSelectedDependencyIds] = useState([])
   const [subtasks, setSubtasks] = useState([])
   const [editorFontFamily, setEditorFontFamily] = useState('Segoe UI')
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [priorityFilter, setPriorityFilter] = useState('all')
+  const [assigneeFilter, setAssigneeFilter] = useState('all')
+  const debouncedSearch = useDebouncedValue(search, 280)
 
   const editor = useEditor({
     extensions: [
@@ -69,14 +77,49 @@ export default function ProjectDetailsPage() {
     },
   })
 
+  const filteredTasks = useMemo(() => {
+    const query = debouncedSearch.trim().toLowerCase()
+
+    return tasks.filter((task) => {
+      if (statusFilter !== 'all' && task.status !== statusFilter) return false
+      if (priorityFilter !== 'all' && task.priority !== priorityFilter) return false
+      if (assigneeFilter !== 'all' && String(task.assigned_user_id || '') !== assigneeFilter) return false
+
+      if (!query) return true
+
+      return [task.name, task.description, task.assignee?.name, ...(task.labels || [])]
+        .filter(Boolean)
+        .some((value) =>
+          String(value)
+            .replace(/<[^>]*>/g, ' ')
+            .toLowerCase()
+            .includes(query),
+        )
+    })
+  }, [assigneeFilter, debouncedSearch, priorityFilter, statusFilter, tasks])
+
   const groupedTasks = useMemo(
     () => ({
-      todo: tasks.filter((task) => task.status === 'todo'),
-      in_progress: tasks.filter((task) => task.status === 'in_progress'),
-      done: tasks.filter((task) => task.status === 'done'),
+      todo: filteredTasks.filter((task) => task.status === 'todo'),
+      in_progress: filteredTasks.filter((task) => task.status === 'in_progress'),
+      done: filteredTasks.filter((task) => task.status === 'done'),
     }),
-    [tasks],
+    [filteredTasks],
   )
+
+  const taskStats = useMemo(() => {
+    const overdue = tasks.filter((task) => task.is_overdue).length
+    const done = tasks.filter((task) => task.status === 'done').length
+    const blocked = tasks.filter((task) => Array.isArray(task.dependency_ids) && task.dependency_ids.length > 0).length
+
+    return {
+      total: tasks.length,
+      done,
+      overdue,
+      blocked,
+      completionRate: tasks.length ? Math.round((done / tasks.length) * 100) : 0,
+    }
+  }, [tasks])
 
   const dependencyOptions = useMemo(
     () => tasks.map((task) => ({ id: task.id, name: task.name })),
@@ -95,7 +138,7 @@ export default function ProjectDetailsPage() {
         setMembers(memberData)
         setTasks(taskData)
       } catch (error) {
-        toast.error(error?.response?.data?.message || 'Could not load project details')
+        toast.error(getApiErrorDetails(error, 'Could not load project details').message)
       }
     }
 
@@ -139,7 +182,7 @@ export default function ProjectDetailsPage() {
       setEditorFontFamily('Segoe UI')
       toast.success('Task created')
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Could not create task')
+      toast.error(getApiErrorDetails(error, 'Could not create task').message)
     }
   }
 
@@ -148,7 +191,7 @@ export default function ProjectDetailsPage() {
       const updated = await tasksApi.updateTaskStatus(id, task.id, status)
       setTasks((prev) => prev.map((item) => (item.id === task.id ? updated : item)))
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Could not move task')
+      toast.error(getApiErrorDetails(error, 'Could not move task').message)
     }
   }
 
@@ -161,7 +204,7 @@ export default function ProjectDetailsPage() {
       setTasks((prev) => prev.filter((item) => item.id !== task.id))
       toast.success('Task deleted')
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Could not delete task')
+      toast.error(getApiErrorDetails(error, 'Could not delete task').message)
     }
   }
 
@@ -182,6 +225,13 @@ export default function ProjectDetailsPage() {
   const handleDependencyChange = (event) => {
     const values = Array.from(event.target.selectedOptions, (option) => Number(option.value))
     setSelectedDependencyIds(normalizeDependencyIds(values))
+  }
+
+  const clearFilters = () => {
+    setSearch('')
+    setStatusFilter('all')
+    setPriorityFilter('all')
+    setAssigneeFilter('all')
   }
 
   const applyLink = () => {
@@ -218,6 +268,63 @@ export default function ProjectDetailsPage() {
         <h1 className="project-details-page__title">{project?.name || 'Project'}</h1>
         <p className="project-details-page__description">{project?.description || 'No description'}</p>
         <p className="project-details-page__invite">Invite code: {project?.invite_code}</p>
+
+        <section className="project-details-page__kpis">
+          <KpiCard label="Total Tasks" value={taskStats.total} />
+          <KpiCard label="Done" value={taskStats.done} tone="good" />
+          <KpiCard label="Blocked" value={taskStats.blocked} />
+          <KpiCard label="Overdue" value={taskStats.overdue} tone="danger" />
+          <KpiCard label="Completion" value={`${taskStats.completionRate}%`} />
+        </section>
+
+        <section className="project-details-page__filters">
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="project-details-page__input"
+            placeholder="Search tasks by title, description, label or assignee"
+          />
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            className="project-details-page__input"
+          >
+            <option value="all">All statuses</option>
+            {columns.map((column) => (
+              <option key={column.key} value={column.key}>
+                {column.title}
+              </option>
+            ))}
+          </select>
+          <select
+            value={priorityFilter}
+            onChange={(event) => setPriorityFilter(event.target.value)}
+            className="project-details-page__input"
+          >
+            <option value="all">All priorities</option>
+            {PRIORITY_OPTIONS.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={assigneeFilter}
+            onChange={(event) => setAssigneeFilter(event.target.value)}
+            className="project-details-page__input"
+          >
+            <option value="all">All assignees</option>
+            {members.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
+            ))}
+          </select>
+          <button type="button" className="project-details-page__clear-filters" onClick={clearFilters}>
+            Clear filters
+          </button>
+        </section>
 
         <section className="project-details-page__create-task">
           <h2 className="project-details-page__section-title">Create task</h2>
@@ -467,10 +574,16 @@ export default function ProjectDetailsPage() {
         </section>
 
         <section className="project-details-page__columns">
+          <p className="project-details-page__results">
+            Showing {filteredTasks.length} of {tasks.length} tasks
+          </p>
           {columns.map((column) => (
             <div key={column.key} className="project-details-page__column">
               <h3 className="project-details-page__column-title">{column.title}</h3>
               <div className="project-details-page__task-list">
+                {groupedTasks[column.key].length === 0 && (
+                  <p className="project-details-page__column-empty">No tasks in this column</p>
+                )}
                 {groupedTasks[column.key].map((task) => (
                   <div key={task.id}>
                     <TaskCard projectId={id} task={task} onDelete={handleDeleteTask} />

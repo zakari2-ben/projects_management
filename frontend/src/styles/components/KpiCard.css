@@ -1,0 +1,30 @@
+.kpi-card {
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: linear-gradient(150deg, #ffffff 0%, #f4f7ff 100%);
+  padding: 0.9rem 1rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.kpi-card__label {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.kpi-card__value {
+  margin: 0.35rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.kpi-card--danger .kpi-card__value {
+  color: #b91c1c;
+}
+
+.kpi-card--good .kpi-card__value {
+  color: #047857;
+}

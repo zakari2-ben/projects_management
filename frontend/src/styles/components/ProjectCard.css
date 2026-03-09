@@ -1,39 +1,66 @@
 .project-card {
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 0.95rem;
+  background: linear-gradient(155deg, #ffffff 0%, #f4f8ff 100%);
   padding: 1rem;
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
 }
 
 .project-card__title {
   margin: 0;
-  color: #0f172a;
+  color: var(--text-main);
   font-size: 1.125rem;
   font-weight: 600;
 }
 
 .project-card__description {
   margin: 0.5rem 0 0;
-  color: #475569;
+  color: var(--text-muted);
   font-size: 0.875rem;
 }
 
+.project-card__meta {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.project-card__meta span {
+  border: 1px solid #cad8f2;
+  border-radius: 999px;
+  background: #ebf2ff;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.74rem;
+  color: #1e3a8a;
+}
+
+.project-card__owner {
+  margin-top: 0.65rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .project-card__invite {
-  margin-top: 0.75rem;
-  color: #64748b;
+  margin-top: 0.45rem;
+  color: #2d4d79;
   font-size: 0.75rem;
 }
 
 .project-card__link {
   margin-top: 1rem;
   display: inline-block;
-  border-radius: 0.375rem;
-  background: #2563eb;
+  border-radius: 0.55rem;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
   color: #fff;
-  padding: 0.375rem 0.75rem;
+  padding: 0.43rem 0.82rem;
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
 }
-

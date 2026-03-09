@@ -73,6 +73,12 @@
   background: #eff6ff;
 }
 
+.task-card__chip--overdue {
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
 .task-card__chip--priority-low {
   border: 1px solid #cbd5e1;
   color: #334155;

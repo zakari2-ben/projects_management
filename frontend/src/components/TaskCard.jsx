@@ -34,6 +34,7 @@ export default function TaskCard({ projectId, task, onDelete }) {
         <span className={`task-card__chip task-card__chip--priority-${priorityValue}`}>
           Priority: {priorityLabel}
         </span>
+        {task.is_overdue && <span className="task-card__chip task-card__chip--overdue">Overdue</span>}
         {labels.slice(0, 3).map((label) => (
           <span key={label} className="task-card__chip task-card__chip--label">
             #{label}

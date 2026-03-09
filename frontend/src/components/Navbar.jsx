@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 import '../styles/components/Navbar.css'
 
@@ -7,20 +8,24 @@ export default function Navbar() {
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    await logout()
-    navigate('/login')
+    try {
+      await logout()
+      navigate('/login')
+    } catch {
+      toast.error('Could not log out. Please try again.')
+    }
   }
 
   return (
     <nav className="navbar">
       <div className="navbar__container">
         <div className="navbar__left">
-          <Link to="/dashboard" className="navbar__brand">
+          <NavLink to="/dashboard" className="navbar__brand">
             PM App
-          </Link>
-          <Link to="/projects" className="navbar__link">
+          </NavLink>
+          <NavLink to="/projects" className={({ isActive }) => `navbar__link ${isActive ? 'navbar__link--active' : ''}`}>
             Projects
-          </Link>
+          </NavLink>
         </div>
         <div className="navbar__right">
           <span className="navbar__user">{user?.name}</span>

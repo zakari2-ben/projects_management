@@ -5,17 +5,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(15, 23, 42, 0.5);
   padding: 1rem;
 }
 
 .modal__content {
   width: 100%;
   max-width: 28rem;
-  border-radius: 0.75rem;
+  border-radius: 0.95rem;
   background: #fff;
   padding: 1.25rem;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.24);
 }
 
 .modal__header {
@@ -37,4 +37,3 @@
   color: #64748b;
   cursor: pointer;
 }
-
