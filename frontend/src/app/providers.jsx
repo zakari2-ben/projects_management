@@ -7,7 +7,16 @@ export function AppProviders({ children }) {
     <AuthProvider>
       <ProjectProvider>
         {children}
-        <Toaster position="top-right" />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3500,
+            style: {
+              border: '1px solid #cbd5e1',
+              color: '#0f172a',
+            },
+          }}
+        />
       </ProjectProvider>
     </AuthProvider>
   )

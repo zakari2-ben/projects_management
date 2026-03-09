@@ -1,0 +1,23 @@
+.page-loader {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  color: var(--text-muted);
+}
+
+.page-loader__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #bfd4fb;
+  border-top-color: #1d4ed8;
+  border-radius: 999px;
+  animation: page-loader-spin 0.8s linear infinite;
+}
+
+@keyframes page-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

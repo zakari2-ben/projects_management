@@ -1,17 +1,24 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, createBrowserRouter } from 'react-router-dom'
+import PageLoader from '../components/PageLoader'
 import { useAuth } from '../context/AuthContext'
-import DashboardPage from '../pages/DashboardPage'
-import LoginPage from '../pages/LoginPage'
-import ProjectDetailsPage from '../pages/ProjectDetailsPage'
-import ProjectsPage from '../pages/ProjectsPage'
-import RegisterPage from '../pages/RegisterPage'
-import TaskDetailsPage from '../pages/TaskDetailsPage'
+
+const DashboardPage = lazy(() => import('../pages/DashboardPage'))
+const LoginPage = lazy(() => import('../pages/LoginPage'))
+const ProjectDetailsPage = lazy(() => import('../pages/ProjectDetailsPage'))
+const ProjectsPage = lazy(() => import('../pages/ProjectsPage'))
+const RegisterPage = lazy(() => import('../pages/RegisterPage'))
+const TaskDetailsPage = lazy(() => import('../pages/TaskDetailsPage'))
+
+function withPageLoader(page) {
+  return <Suspense fallback={<PageLoader />}>{page}</Suspense>
+}
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()
 
   if (loading) {
-    return <div className="p-6">Loading...</div>
+    return <PageLoader />
   }
 
   if (!isAuthenticated) {
@@ -25,7 +32,7 @@ function GuestRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()
 
   if (loading) {
-    return <div className="p-6">Loading...</div>
+    return <PageLoader />
   }
 
   if (isAuthenticated) {
@@ -41,7 +48,7 @@ export const router = createBrowserRouter([
     path: '/login',
     element: (
       <GuestRoute>
-        <LoginPage />
+        {withPageLoader(<LoginPage />)}
       </GuestRoute>
     ),
   },
@@ -49,7 +56,7 @@ export const router = createBrowserRouter([
     path: '/register',
     element: (
       <GuestRoute>
-        <RegisterPage />
+        {withPageLoader(<RegisterPage />)}
       </GuestRoute>
     ),
   },
@@ -57,7 +64,7 @@ export const router = createBrowserRouter([
     path: '/dashboard',
     element: (
       <ProtectedRoute>
-        <DashboardPage />
+        {withPageLoader(<DashboardPage />)}
       </ProtectedRoute>
     ),
   },
@@ -65,7 +72,7 @@ export const router = createBrowserRouter([
     path: '/projects',
     element: (
       <ProtectedRoute>
-        <ProjectsPage />
+        {withPageLoader(<ProjectsPage />)}
       </ProtectedRoute>
     ),
   },
@@ -73,7 +80,7 @@ export const router = createBrowserRouter([
     path: '/projects/:projectId',
     element: (
       <ProtectedRoute>
-        <ProjectDetailsPage />
+        {withPageLoader(<ProjectDetailsPage />)}
       </ProtectedRoute>
     ),
   },
@@ -81,7 +88,7 @@ export const router = createBrowserRouter([
     path: '/projects/:projectId/tasks/:taskId',
     element: (
       <ProtectedRoute>
-        <TaskDetailsPage />
+        {withPageLoader(<TaskDetailsPage />)}
       </ProtectedRoute>
     ),
   },
