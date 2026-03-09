@@ -37,9 +37,17 @@ class TaskController extends Controller
             throw new HttpException(422, 'Assigned user must be a project member.');
         }
 
+        $validated = $request->validated();
+        $dependencyIds = $validated['dependency_ids'] ?? [];
+        $this->ensureDependenciesBelongToProject($project, $dependencyIds);
+
         $task = $project->tasks()->create([
-            ...$request->validated(),
+            ...$validated,
             'status' => $request->input('status', Task::STATUS_TODO),
+            'priority' => $request->input('priority', Task::PRIORITY_MEDIUM),
+            'labels' => $this->sanitizeLabels($validated['labels'] ?? []),
+            'subtasks' => $this->sanitizeSubtasks($validated['subtasks'] ?? []),
+            'dependency_ids' => $this->sanitizeDependencyIds($dependencyIds),
             'created_by' => $request->user()->id,
         ]);
 
@@ -68,7 +76,22 @@ class TaskController extends Controller
             throw new HttpException(422, 'Assigned user must be a project member.');
         }
 
-        $task->update($request->validated());
+        $validated = $request->validated();
+
+        if (array_key_exists('dependency_ids', $validated)) {
+            $this->ensureDependenciesBelongToProject($project, $validated['dependency_ids'] ?? [], $task->id);
+            $validated['dependency_ids'] = $this->sanitizeDependencyIds($validated['dependency_ids'] ?? []);
+        }
+
+        if (array_key_exists('labels', $validated)) {
+            $validated['labels'] = $this->sanitizeLabels($validated['labels'] ?? []);
+        }
+
+        if (array_key_exists('subtasks', $validated)) {
+            $validated['subtasks'] = $this->sanitizeSubtasks($validated['subtasks'] ?? []);
+        }
+
+        $task->update($validated);
         $task->load(['assignee', 'creator']);
 
         return response()->json([
@@ -133,6 +156,70 @@ class TaskController extends Controller
     {
         if ($task->project_id !== $project->id) {
             abort(404, 'Task not found in this project.');
+        }
+    }
+
+    private function sanitizeLabels(array $labels): array
+    {
+        return collect($labels)
+            ->map(static fn (mixed $label) => trim((string) $label))
+            ->filter(static fn (string $label) => $label !== '')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function sanitizeSubtasks(array $subtasks): array
+    {
+        return collect($subtasks)
+            ->map(static function (mixed $subtask): ?array {
+                if (! is_array($subtask)) {
+                    return null;
+                }
+
+                $title = trim((string) ($subtask['title'] ?? ''));
+                if ($title === '') {
+                    return null;
+                }
+
+                return [
+                    'title' => $title,
+                    'done' => (bool) ($subtask['done'] ?? false),
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    private function sanitizeDependencyIds(array $dependencyIds): array
+    {
+        return collect($dependencyIds)
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function ensureDependenciesBelongToProject(Project $project, array $dependencyIds, ?int $currentTaskId = null): void
+    {
+        $ids = $this->sanitizeDependencyIds($dependencyIds);
+
+        if ($currentTaskId && in_array($currentTaskId, $ids, true)) {
+            throw new HttpException(422, 'A task cannot depend on itself.');
+        }
+
+        if ($ids === []) {
+            return;
+        }
+
+        $matchingCount = Task::query()
+            ->where('project_id', $project->id)
+            ->whereIn('id', $ids)
+            ->count();
+
+        if ($matchingCount !== count($ids)) {
+            throw new HttpException(422, 'Dependencies must belong to the same project.');
         }
     }
 }

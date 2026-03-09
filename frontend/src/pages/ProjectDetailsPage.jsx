@@ -12,6 +12,12 @@ import Navbar from '../components/Navbar'
 import TaskCard from '../components/TaskCard'
 import * as projectsApi from '../api/projects.api'
 import * as tasksApi from '../api/tasks.api'
+import {
+  normalizeDependencyIds,
+  normalizeSubtasks,
+  parseLabelsInput,
+  PRIORITY_OPTIONS,
+} from '../utils/taskFields'
 import '../styles/pages/ProjectDetailsPage.css'
 
 const columns = [
@@ -28,8 +34,13 @@ export default function ProjectDetailsPage() {
   const [tasks, setTasks] = useState([])
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [startDate, setStartDate] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [priority, setPriority] = useState('medium')
+  const [labelsInput, setLabelsInput] = useState('')
   const [assignedUserId, setAssignedUserId] = useState('')
+  const [selectedDependencyIds, setSelectedDependencyIds] = useState([])
+  const [subtasks, setSubtasks] = useState([])
   const [editorFontFamily, setEditorFontFamily] = useState('Segoe UI')
 
   const editor = useEditor({
@@ -58,7 +69,6 @@ export default function ProjectDetailsPage() {
     },
   })
 
-  // Derive kanban columns from one source of truth (tasks state).
   const groupedTasks = useMemo(
     () => ({
       todo: tasks.filter((task) => task.status === 'todo'),
@@ -68,10 +78,14 @@ export default function ProjectDetailsPage() {
     [tasks],
   )
 
+  const dependencyOptions = useMemo(
+    () => tasks.map((task) => ({ id: task.id, name: task.name })),
+    [tasks],
+  )
+
   useEffect(() => {
     const load = async () => {
       try {
-        // Load all required project data in parallel to reduce waiting time.
         const [projectData, memberData, taskData] = await Promise.all([
           projectsApi.getProject(id),
           projectsApi.getProjectMembers(id),
@@ -80,8 +94,8 @@ export default function ProjectDetailsPage() {
         setProject(projectData)
         setMembers(memberData)
         setTasks(taskData)
-      } catch {
-        toast.error('Could not load project details')
+      } catch (error) {
+        toast.error(error?.response?.data?.message || 'Could not load project details')
       }
     }
 
@@ -90,36 +104,51 @@ export default function ProjectDetailsPage() {
 
   const handleCreateTask = async (event) => {
     event.preventDefault()
+
+    if (startDate && dueDate && dueDate < startDate) {
+      toast.error('Due date must be after start date')
+      return
+    }
+
     try {
-      const newTask = await tasksApi.createTask(id, {
+      const payload = {
         name,
         description,
+        start_date: startDate || undefined,
         due_date: dueDate || undefined,
-        // API expects number|null, while <select> gives us a string.
+        priority,
+        labels: parseLabelsInput(labelsInput),
+        subtasks: normalizeSubtasks(subtasks),
+        dependency_ids: normalizeDependencyIds(selectedDependencyIds),
         assigned_user_id: assignedUserId ? Number(assignedUserId) : null,
-      })
-      // Insert immediately in local state to avoid a full re-fetch.
+      }
+
+      const newTask = await tasksApi.createTask(id, payload)
       setTasks((prev) => [newTask, ...prev])
       setName('')
       setDescription('')
+      setStartDate('')
       setDueDate('')
+      setPriority('medium')
+      setLabelsInput('')
       setAssignedUserId('')
+      setSelectedDependencyIds([])
+      setSubtasks([])
       editor?.commands.clearContent()
       editor?.commands.setFontFamily('Segoe UI')
       setEditorFontFamily('Segoe UI')
       toast.success('Task created')
-    } catch {
-      toast.error('Could not create task')
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Could not create task')
     }
   }
 
   const quickMove = async (task, status) => {
     try {
       const updated = await tasksApi.updateTaskStatus(id, task.id, status)
-      // Replace only the moved task, keep all others unchanged.
       setTasks((prev) => prev.map((item) => (item.id === task.id ? updated : item)))
-    } catch {
-      toast.error('Could not move task')
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Could not move task')
     }
   }
 
@@ -131,9 +160,28 @@ export default function ProjectDetailsPage() {
       await tasksApi.deleteTask(id, task.id)
       setTasks((prev) => prev.filter((item) => item.id !== task.id))
       toast.success('Task deleted')
-    } catch {
-      toast.error('Could not delete task')
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Could not delete task')
     }
+  }
+
+  const addSubtask = () => {
+    setSubtasks((prev) => [...prev, { title: '', done: false }])
+  }
+
+  const updateSubtask = (index, next) => {
+    setSubtasks((prev) =>
+      prev.map((subtask, itemIndex) => (itemIndex === index ? { ...subtask, ...next } : subtask)),
+    )
+  }
+
+  const removeSubtask = (index) => {
+    setSubtasks((prev) => prev.filter((_, itemIndex) => itemIndex !== index))
+  }
+
+  const handleDependencyChange = (event) => {
+    const values = Array.from(event.target.selectedOptions, (option) => Number(option.value))
+    setSelectedDependencyIds(normalizeDependencyIds(values))
   }
 
   const applyLink = () => {
@@ -205,6 +253,37 @@ export default function ProjectDetailsPage() {
               </div>
 
               <div className="project-details-page__sidebar-row">
+                <label htmlFor="task-priority" className="project-details-page__field-label">
+                  Priority
+                </label>
+                <select
+                  id="task-priority"
+                  value={priority}
+                  onChange={(event) => setPriority(event.target.value)}
+                  className="project-details-page__input"
+                >
+                  {PRIORITY_OPTIONS.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="project-details-page__sidebar-row">
+                <label htmlFor="task-start-date" className="project-details-page__field-label">
+                  Start date
+                </label>
+                <input
+                  id="task-start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(event) => setStartDate(event.target.value)}
+                  className="project-details-page__input"
+                />
+              </div>
+
+              <div className="project-details-page__sidebar-row">
                 <label htmlFor="task-due-date" className="project-details-page__field-label">
                   Due date
                 </label>
@@ -215,6 +294,40 @@ export default function ProjectDetailsPage() {
                   onChange={(event) => setDueDate(event.target.value)}
                   className="project-details-page__input"
                 />
+              </div>
+
+              <div className="project-details-page__sidebar-row">
+                <label htmlFor="task-labels" className="project-details-page__field-label">
+                  Labels (comma separated)
+                </label>
+                <input
+                  id="task-labels"
+                  type="text"
+                  value={labelsInput}
+                  onChange={(event) => setLabelsInput(event.target.value)}
+                  className="project-details-page__input"
+                  placeholder="backend, ui, bug"
+                />
+              </div>
+
+              <div className="project-details-page__sidebar-row">
+                <label htmlFor="task-dependencies" className="project-details-page__field-label">
+                  Dependencies
+                </label>
+                <select
+                  id="task-dependencies"
+                  multiple
+                  className="project-details-page__input project-details-page__input--multi"
+                  value={selectedDependencyIds.map(String)}
+                  onChange={handleDependencyChange}
+                >
+                  {dependencyOptions.length === 0 && <option value="">No tasks yet</option>}
+                  {dependencyOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      #{option.id} {option.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </aside>
 
@@ -306,6 +419,43 @@ export default function ProjectDetailsPage() {
                 </div>
                 <EditorContent editor={editor} />
               </div>
+
+              <section className="project-details-page__subtasks">
+                <div className="project-details-page__subtasks-head">
+                  <p className="project-details-page__field-label">Subtasks</p>
+                  <button
+                    type="button"
+                    onClick={addSubtask}
+                    className="project-details-page__subtask-add"
+                  >
+                    Add subtask
+                  </button>
+                </div>
+                {subtasks.length === 0 && <p className="project-details-page__subtasks-empty">No subtasks yet</p>}
+                {subtasks.map((subtask, index) => (
+                  <div key={`new-subtask-${index}`} className="project-details-page__subtask-row">
+                    <input
+                      type="checkbox"
+                      checked={subtask.done}
+                      onChange={(event) => updateSubtask(index, { done: event.target.checked })}
+                    />
+                    <input
+                      type="text"
+                      value={subtask.title}
+                      onChange={(event) => updateSubtask(index, { title: event.target.value })}
+                      className="project-details-page__input"
+                      placeholder="Subtask title"
+                    />
+                    <button
+                      type="button"
+                      className="project-details-page__subtask-remove"
+                      onClick={() => removeSubtask(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </section>
 
               <div className="project-details-page__submit-row">
                 <button type="submit" className="project-details-page__submit">

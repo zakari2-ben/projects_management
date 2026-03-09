@@ -62,4 +62,26 @@ class TaskTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_task_dependencies_must_belong_to_same_project(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['created_by' => $owner->id]);
+        $anotherProject = Project::factory()->create(['created_by' => $owner->id]);
+
+        $project->members()->attach($owner->id);
+        $anotherProject->members()->attach($owner->id);
+
+        $externalTask = Task::factory()->create([
+            'project_id' => $anotherProject->id,
+            'created_by' => $owner->id,
+        ]);
+
+        $response = $this->actingAs($owner)->postJson("/api/projects/{$project->id}/tasks", [
+            'name' => 'Task with invalid dependency',
+            'dependency_ids' => [$externalTask->id],
+        ]);
+
+        $response->assertStatus(422);
+    }
 }

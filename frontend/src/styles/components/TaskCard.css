@@ -53,6 +53,50 @@
   overflow: hidden;
 }
 
+.task-card__chips {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.task-card__chip {
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.16rem 0.45rem;
+}
+
+.task-card__chip--label {
+  border: 1px solid #dbeafe;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.task-card__chip--priority-low {
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  background: #f8fafc;
+}
+
+.task-card__chip--priority-medium {
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.task-card__chip--priority-high {
+  border: 1px solid #fdba74;
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.task-card__chip--priority-critical {
+  border: 1px solid #fda4af;
+  color: #be123c;
+  background: #fff1f2;
+}
+
 .task-card__meta {
   margin-top: 0.5rem;
   display: flex;
@@ -68,6 +112,32 @@
   font-size: 0.75rem;
   padding: 0.2rem 0.5rem;
   overflow-wrap: anywhere;
+}
+
+.task-card__progress {
+  margin-top: 0.6rem;
+}
+
+.task-card__progress-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.task-card__progress-track {
+  margin-top: 0.3rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.task-card__progress-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
 }
 
 .task-card__actions {

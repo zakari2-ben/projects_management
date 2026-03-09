@@ -58,6 +58,10 @@
   background: #fff;
 }
 
+.task-details-page__input--multi {
+  min-height: 7rem;
+}
+
 .task-details-page__field-label {
   margin: 0;
   font-size: 0.875rem;
@@ -143,6 +147,65 @@
   margin: 0;
   font-size: 1.25rem;
   color: #0f172a;
+}
+
+.task-details-page__labels {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.task-details-page__label-chip {
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.task-details-page__subtask-progress {
+  margin-top: 0.8rem;
+}
+
+.task-details-page__subtask-progress-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  color: #334155;
+  font-size: 0.85rem;
+}
+
+.task-details-page__subtask-progress-track {
+  margin-top: 0.35rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.task-details-page__subtask-progress-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #15803d);
+}
+
+.task-details-page__subtask-list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.task-details-page__subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #334155;
+  font-size: 0.9rem;
 }
 
 .task-details-page__content {
@@ -309,6 +372,29 @@
   max-width: 100%;
   height: auto;
   border-radius: 0.375rem;
+}
+
+.task-details-page__subtasks-editor {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.task-details-page__subtasks-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-details-page__subtask-edit-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .task-details-page__actions {
