@@ -10,7 +10,11 @@ import { TextStyle } from '@tiptap/extension-text-style'
 import FontFamily from '@tiptap/extension-font-family'
 import KpiCard from '../components/KpiCard'
 import Navbar from '../components/Navbar'
-import TaskCard from '../components/TaskCard'
+import ProjectCollaborationPanel from '../components/ProjectCollaborationPanel'
+import ProjectCreateTaskSection from '../components/project-details/ProjectCreateTaskSection'
+import ProjectTaskBoard from '../components/project-details/ProjectTaskBoard'
+import { useAuth } from '../context/AuthContext'
+import { useRichTextEditor } from '../hooks/useRichTextEditor'
 import * as projectsApi from '../api/projects.api'
 import * as tasksApi from '../api/tasks.api'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
@@ -23,14 +27,21 @@ import {
 import { getApiErrorDetails } from '../utils/http'
 import '../styles/pages/ProjectDetailsPage.css'
 
-const columns = [
-  { key: 'todo', title: 'To Do' },
-  { key: 'in_progress', title: 'In Progress' },
-  { key: 'done', title: 'Done' },
-]
+const initialFormState = {
+  name: '',
+  description: '',
+  startDate: '',
+  dueDate: '',
+  priority: 'medium',
+  labelsInput: '',
+  assignedUserId: '',
+  selectedDependencyIds: [],
+  subtasks: [],
+}
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams()
+  const { user } = useAuth()
   const id = Number(projectId)
   const [project, setProject] = useState(null)
   const [members, setMembers] = useState([])
@@ -51,31 +62,11 @@ export default function ProjectDetailsPage() {
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const debouncedSearch = useDebouncedValue(search, 280)
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      TextStyle,
-      FontFamily,
-      Link.configure({
-        openOnClick: false,
-        autolink: true,
-      }),
-      Image.configure({
-        inline: false,
-        allowBase64: true,
-      }),
-    ],
-    content: '',
-    onUpdate: ({ editor: currentEditor }) => {
-      setDescription(currentEditor.getHTML())
-    },
-    editorProps: {
-      attributes: {
-        class: 'project-details-page__editor-content',
-      },
-    },
-  })
+  const { editor, editorFontFamily, setEditorFontFamily, applyLink, handleImageUpload, resetEditor } =
+    useRichTextEditor({
+      contentClassName: 'project-details-page__editor-content',
+      onChange: (value) => setFormState((prev) => ({ ...prev, description: value })),
+    })
 
   const filteredTasks = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase()
@@ -145,51 +136,99 @@ export default function ProjectDetailsPage() {
     void load()
   }, [id])
 
+  const buildEventNotifications = (targets, title, message, taskId) =>
+    [...new Set(targets.map((target) => String(target)).filter(Boolean))]
+      .filter((target) => target !== String(currentUser.id))
+      .flatMap((recipientId) => [
+        {
+          id: `${Date.now()}-${recipientId}-inapp`,
+          recipientId,
+          channel: 'in_app',
+          title,
+          message,
+          taskId,
+          createdAt: new Date().toISOString(),
+          readAt: null,
+        },
+        {
+          id: `${Date.now()}-${recipientId}-email`,
+          recipientId,
+          channel: 'email',
+          title,
+          message,
+          taskId,
+          createdAt: new Date().toISOString(),
+          readAt: null,
+          status: 'queued',
+          sentAt: null,
+        },
+      ])
+
+  const pushCollabEvent = (event) => {
+    setCollabEvents((prev) => [
+      { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, createdAt: new Date().toISOString(), ...event },
+      ...prev,
+    ])
+  }
+
+  const handleFormField = (name, value) => {
+    setFormState((prev) => ({ ...prev, [name]: value }))
+  }
+
   const handleCreateTask = async (event) => {
     event.preventDefault()
-
-    if (startDate && dueDate && dueDate < startDate) {
+    if (formState.startDate && formState.dueDate && formState.dueDate < formState.startDate) {
       toast.error('Due date must be after start date')
       return
     }
 
     try {
       const payload = {
-        name,
-        description,
-        start_date: startDate || undefined,
-        due_date: dueDate || undefined,
-        priority,
-        labels: parseLabelsInput(labelsInput),
-        subtasks: normalizeSubtasks(subtasks),
-        dependency_ids: normalizeDependencyIds(selectedDependencyIds),
-        assigned_user_id: assignedUserId ? Number(assignedUserId) : null,
+        name: formState.name,
+        description: formState.description,
+        start_date: formState.startDate || undefined,
+        due_date: formState.dueDate || undefined,
+        priority: formState.priority,
+        labels: parseLabelsInput(formState.labelsInput),
+        subtasks: normalizeSubtasks(formState.subtasks),
+        dependency_ids: normalizeDependencyIds(formState.selectedDependencyIds),
+        assigned_user_id: formState.assignedUserId ? Number(formState.assignedUserId) : null,
       }
 
       const newTask = await tasksApi.createTask(id, payload)
       setTasks((prev) => [newTask, ...prev])
-      setName('')
-      setDescription('')
-      setStartDate('')
-      setDueDate('')
-      setPriority('medium')
-      setLabelsInput('')
-      setAssignedUserId('')
-      setSelectedDependencyIds([])
-      setSubtasks([])
-      editor?.commands.clearContent()
-      editor?.commands.setFontFamily('Segoe UI')
-      setEditorFontFamily('Segoe UI')
+      setFormState(initialFormState)
+      resetEditor()
+      setSelectedCommentTaskId(String(newTask.id))
       toast.success('Task created')
+
+      pushCollabEvent({
+        message: `${currentUser.name} created task "${newTask.name}"`,
+        notifications: buildEventNotifications(
+          [newTask.assignee?.id],
+          'New task assigned',
+          `You were assigned to "${newTask.name}"`,
+          newTask.id,
+        ),
+      })
     } catch (error) {
       toast.error(getApiErrorDetails(error, 'Could not create task').message)
     }
   }
 
-  const quickMove = async (task, status) => {
+  const handleMoveTask = async (task, status) => {
     try {
       const updated = await tasksApi.updateTaskStatus(id, task.id, status)
       setTasks((prev) => prev.map((item) => (item.id === task.id ? updated : item)))
+      pushCollabEvent({
+        message: `${currentUser.name} moved "${updated.name}" to ${status.replace('_', ' ')}`,
+        notifications: buildEventNotifications(
+          [updated.assignee?.id],
+          'Task status updated',
+          `"${updated.name}" moved to ${status.replace('_', ' ')}`,
+          updated.id,
+        ),
+      })
     } catch (error) {
       toast.error(getApiErrorDetails(error, 'Could not move task').message)
     }
@@ -203,28 +242,23 @@ export default function ProjectDetailsPage() {
       await tasksApi.deleteTask(id, task.id)
       setTasks((prev) => prev.filter((item) => item.id !== task.id))
       toast.success('Task deleted')
+      pushCollabEvent({
+        message: `${currentUser.name} deleted "${task.name}"`,
+        notifications: buildEventNotifications(
+          members.map((member) => member.id),
+          'Task deleted',
+          `"${task.name}" was deleted`,
+          task.id,
+        ),
+      })
     } catch (error) {
       toast.error(getApiErrorDetails(error, 'Could not delete task').message)
     }
   }
 
-  const addSubtask = () => {
-    setSubtasks((prev) => [...prev, { title: '', done: false }])
-  }
-
-  const updateSubtask = (index, next) => {
-    setSubtasks((prev) =>
-      prev.map((subtask, itemIndex) => (itemIndex === index ? { ...subtask, ...next } : subtask)),
-    )
-  }
-
-  const removeSubtask = (index) => {
-    setSubtasks((prev) => prev.filter((_, itemIndex) => itemIndex !== index))
-  }
-
   const handleDependencyChange = (event) => {
     const values = Array.from(event.target.selectedOptions, (option) => Number(option.value))
-    setSelectedDependencyIds(normalizeDependencyIds(values))
+    handleFormField('selectedDependencyIds', normalizeDependencyIds(values))
   }
 
   const clearFilters = () => {
