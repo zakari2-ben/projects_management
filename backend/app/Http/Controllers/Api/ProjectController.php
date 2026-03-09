@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Project\JoinProjectRequest;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
@@ -19,7 +20,7 @@ class ProjectController extends Controller
         $projects = $request->user()
             ->projects()
             ->with('owner')
-            ->withCount('tasks')
+            ->withCount(['tasks', 'members'])
             ->latest('projects.id')
             ->get();
 
@@ -48,7 +49,7 @@ class ProjectController extends Controller
     public function show(Request $request, Project $project): ProjectResource
     {
         $this->authorize('view', $project);
-        $project->load(['owner', 'members'])->loadCount('tasks');
+        $project->load(['owner', 'members'])->loadCount(['tasks', 'members']);
 
         return ProjectResource::make($project);
     }
@@ -76,15 +77,13 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function join(Request $request): JsonResponse
+    public function join(JoinProjectRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'invite_code' => ['required', 'string', 'exists:projects,invite_code'],
-        ]);
+        $validated = $request->validated();
 
         $project = Project::where('invite_code', $validated['invite_code'])->firstOrFail();
         $project->members()->syncWithoutDetaching([$request->user()->id]);
-        $project->load(['owner', 'members'])->loadCount('tasks');
+        $project->load(['owner', 'members'])->loadCount(['tasks', 'members']);
 
         return response()->json([
             'message' => 'Joined project successfully.',

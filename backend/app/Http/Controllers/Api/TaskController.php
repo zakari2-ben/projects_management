@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Http\Requests\Task\AssignTaskRequest;
+use App\Http\Requests\Task\IndexTaskRequest;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Http\Requests\Task\UpdateTaskStatusRequest;
@@ -13,8 +14,9 @@ use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Models\Task;
 use App\Services\TaskService;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class TaskController extends Controller
@@ -22,13 +24,19 @@ class TaskController extends Controller
     public function __construct(private readonly TaskService $taskService)
     {
     }
-    public function index(Request $request, Project $project)
+
+    public function index(IndexTaskRequest $request, Project $project)
     {
         $this->ensureProjectMember($request->user()->id, $project);
 
-        $tasks = $project->tasks()
-            ->with(['assignee', 'creator'])
-            ->latest('id')
+        $validated = $request->validated();
+
+        $tasks = $this->applyTaskFilters(
+            $project->tasks()->with(['assignee', 'creator']),
+            $validated
+        );
+
+        $tasks = $this->applyTaskSorting($tasks, $validated)
             ->get();
 
         return TaskResource::collection($tasks);
@@ -65,7 +73,7 @@ class TaskController extends Controller
         ], 201);
     }
 
-    public function show(Request $request, Project $project, Task $task): TaskResource
+    public function show(Project $project, Task $task): TaskResource
     {
         $this->ensureTaskBelongsToProject($project, $task);
         $this->authorize('view', $task);
@@ -163,5 +171,71 @@ class TaskController extends Controller
         if ($task->project_id !== $project->id) {
             abort(404, 'Task not found in this project.');
         }
+    }
+
+    private function applyTaskFilters(Builder|HasMany $query, array $filters): Builder|HasMany
+    {
+        if (! empty($filters['search'])) {
+            $search = trim((string) $filters['search']);
+
+            $query->where(static function (Builder $builder) use ($search): void {
+                $builder
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (! empty($filters['priority'])) {
+            $query->where('priority', $filters['priority']);
+        }
+
+        if (array_key_exists('assigned_user_id', $filters)) {
+            $query->where('assigned_user_id', $filters['assigned_user_id']);
+        }
+
+        if (! empty($filters['due_after'])) {
+            $query->whereDate('due_date', '>=', $filters['due_after']);
+        }
+
+        if (! empty($filters['due_before'])) {
+            $query->whereDate('due_date', '<=', $filters['due_before']);
+        }
+
+        return $query;
+    }
+
+    private function applyTaskSorting(Builder|HasMany $query, array $filters): Builder|HasMany
+    {
+        $direction = ($filters['sort_direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+        $sortBy = $filters['sort_by'] ?? 'id';
+
+        if ($sortBy === 'priority') {
+            return $query->orderByRaw(
+                "CASE priority
+                    WHEN 'critical' THEN 1
+                    WHEN 'high' THEN 2
+                    WHEN 'medium' THEN 3
+                    WHEN 'low' THEN 4
+                    ELSE 5
+                END {$direction}"
+            )->orderBy('id', 'desc');
+        }
+
+        if ($sortBy === 'status') {
+            return $query->orderByRaw(
+                "CASE status
+                    WHEN 'todo' THEN 1
+                    WHEN 'in_progress' THEN 2
+                    WHEN 'done' THEN 3
+                    ELSE 4
+                END {$direction}"
+            )->orderBy('id', 'desc');
+        }
+
+        return $query->orderBy($sortBy, $direction)->orderBy('id', 'desc');
     }
 }
