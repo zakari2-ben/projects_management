@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use BackedEnum;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,10 @@ class TaskResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $statusValue = $this->status instanceof BackedEnum
+            ? $this->status->value
+            : (string) $this->status;
+
         return [
             'id' => $this->id,
             'project_id' => $this->project_id,
@@ -30,6 +35,9 @@ class TaskResource extends JsonResource
             'created_by' => $this->created_by,
             'assignee' => UserResource::make($this->whenLoaded('assignee')),
             'creator' => UserResource::make($this->whenLoaded('creator')),
+            'is_overdue' => $this->due_date !== null
+                && $statusValue !== 'done'
+                && $this->due_date->isPast(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

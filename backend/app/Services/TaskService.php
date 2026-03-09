@@ -45,6 +45,7 @@ class TaskService
     {
         return collect($dependencyIds)
             ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
             ->unique()
             ->values()
             ->all();
