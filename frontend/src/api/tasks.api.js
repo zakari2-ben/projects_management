@@ -6,8 +6,8 @@ async function getTasks(projectId) {
 }
 async function getTask(projectId, taskId) {
   const { data } = await api.get(`/projects/${projectId}/tasks/${taskId}`);
-  // Details endpoint returns the task object directly.
-  return data;
+  // Laravel JsonResource returns single item inside data.data.
+  return data.data;
 }
 async function createTask(projectId, payload) {
   const { data } = await api.post(`/projects/${projectId}/tasks`, payload);
