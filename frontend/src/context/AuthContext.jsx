@@ -8,12 +8,21 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   const refreshUser = useCallback(async () => {
+    // Only attempt to fetch the profile if we have a token
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      setUser(null)
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     try {
-      const profile = await authApi.me()
-      setUser(profile)
+      const response = await authApi.me()
+      setUser(response.data || response.user || response)
     } catch {
       setUser(null)
+      localStorage.removeItem('auth_token') // Clear invalid token
     } finally {
       setLoading(false)
     }
@@ -21,6 +30,13 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     void refreshUser()
+
+    // Listen for global 401 Unauthorized events from Axios interceptor
+    const handleUnauthorized = () => {
+      setUser(null)
+    }
+    window.addEventListener('auth:unauthorized', handleUnauthorized)
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [refreshUser])
 
   const value = useMemo(
@@ -30,6 +46,9 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(user),
       login: async (email, password) => {
         const response = await authApi.login({ email, password })
+        if (response.token) {
+          localStorage.setItem('auth_token', response.token)
+        }
         setUser(response.user)
       },
       register: async (name, email, password, passwordConfirmation) => {
@@ -39,11 +58,23 @@ export function AuthProvider({ children }) {
           password,
           password_confirmation: passwordConfirmation,
         })
+        if (response.token) {
+          localStorage.setItem('auth_token', response.token)
+        }
         setUser(response.user)
       },
       logout: async () => {
-        await authApi.logout()
-        setUser(null)
+        try {
+          await authApi.logout()
+        } catch (e) {
+          console.error("Logout failed on server, cleaning up local state anyway");
+        } finally {
+          localStorage.removeItem('auth_token')
+          setUser(null)
+        }
+      },
+      updateUserLocally: (updatedUser) => {
+        setUser(updatedUser)
       },
       refreshUser,
     }),
