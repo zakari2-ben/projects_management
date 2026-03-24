@@ -120,12 +120,17 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="register-page__hint">
-          Already have an account?{' '}
-          <Link to="/login" className="register-page__link">
-            Login
+        <div className="register-page__hint flex flex-col items-center gap-2 mt-4 text-sm">
+          <Link to="/forgot-password" className="register-page__link text-indigo-600 dark:text-indigo-400 hover:underline">
+            Forgot your password?
           </Link>
-        </p>
+          <div>
+            Already have an account?{' '}
+            <Link to="/login" className="register-page__link font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+              Login
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )
