@@ -28,7 +28,18 @@ export default function Navbar() {
           </NavLink>
         </div>
         <div className="navbar__right">
-          <span className="navbar__user">{user?.name}</span>
+          <NavLink to="/profile" className="flex items-center space-x-2 mr-3 hover:opacity-80 transition-opacity">
+            <div className="h-8 w-8 rounded-full bg-indigo-100 overflow-hidden border border-indigo-200">
+              {user?.avatar_url ? (
+                <img src={user.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex items-center justify-center h-full w-full text-indigo-700 font-bold text-sm">
+                  {user?.name?.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <span className="navbar__user font-medium">{user?.name}</span>
+          </NavLink>
           <button type="button" onClick={handleLogout} className="navbar__logout">
             Logout
           </button>
