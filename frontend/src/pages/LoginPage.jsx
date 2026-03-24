@@ -82,12 +82,17 @@ export default function LoginPage() {
             {submitting ? 'Loading...' : 'Login'}
           </button>
         </form>
-        <p className="login-page__hint">
-          No account?{' '}
-          <Link to="/register" className="login-page__link">
-            Register
+        <div className="login-page__hint flex flex-col items-center gap-2 mt-4 text-sm">
+          <Link to="/forgot-password" className="login-page__link text-indigo-600 dark:text-indigo-400 hover:underline">
+            Forgot your password?
           </Link>
-        </p>
+          <div>
+            No account?{' '}
+            <Link to="/register" className="login-page__link font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+              Register
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )
