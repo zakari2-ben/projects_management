@@ -35,25 +35,6 @@ function ProtectedRoute({ children }) {
   return <>{children}</>
 }
 
-// Ensure the user is BOTH authenticated AND their email is verified
-function VerifiedRoute({ children }) {
-  const { user, isAuthenticated, loading } = useAuth()
-
-  if (loading) {
-    return <PageLoader />
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
-  }
-
-  if (!user?.email_verified_at) {
-    return <Navigate to="/verify-email" replace />
-  }
-
-  return <>{children}</>
-}
-
 // Ensure the user is NOT authenticated (for login, register, forgot/reset password)
 function GuestRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()
@@ -78,13 +59,11 @@ export const router = createBrowserRouter([
   { path: '/forgot-password', element: <GuestRoute>{withPageLoader(<ForgotPasswordPage />)}</GuestRoute> },
   { path: '/reset-password', element: <GuestRoute>{withPageLoader(<ResetPasswordPage />)}</GuestRoute> },
 
-  // Protected but Unverified Allowed Routes
+  // Protected Routes (verification skipped)
   { path: '/verify-email', element: <ProtectedRoute>{withPageLoader(<VerifyEmailPage />)}</ProtectedRoute> },
   { path: '/profile', element: <ProtectedRoute>{withPageLoader(<ProfilePage />)}</ProtectedRoute> },
-
-  // Protected AND Verified Required Routes
-  { path: '/dashboard', element: <VerifiedRoute>{withPageLoader(<DashboardPage />)}</VerifiedRoute> },
-  { path: '/projects', element: <VerifiedRoute>{withPageLoader(<ProjectsPage />)}</VerifiedRoute> },
-  { path: '/projects/:projectId', element: <VerifiedRoute>{withPageLoader(<ProjectDetailsPage />)}</VerifiedRoute> },
-  { path: '/projects/:projectId/tasks/:taskId', element: <VerifiedRoute>{withPageLoader(<TaskDetailsPage />)}</VerifiedRoute> },
+  { path: '/dashboard', element: <ProtectedRoute>{withPageLoader(<DashboardPage />)}</ProtectedRoute> },
+  { path: '/projects', element: <ProtectedRoute>{withPageLoader(<ProjectsPage />)}</ProtectedRoute> },
+  { path: '/projects/:projectId', element: <ProtectedRoute>{withPageLoader(<ProjectDetailsPage />)}</ProtectedRoute> },
+  { path: '/projects/:projectId/tasks/:taskId', element: <ProtectedRoute>{withPageLoader(<TaskDetailsPage />)}</ProtectedRoute> },
 ])
