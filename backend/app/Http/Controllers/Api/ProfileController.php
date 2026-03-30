@@ -29,8 +29,7 @@ class ProfileController extends Controller
     /**
      * Update the authenticated user's profile info (name, email).
      *
-     * If the email changes, reset email_verified_at so the user must
-     * re-verify their new email address.
+     * If the email changes, keep the account verified (verification disabled).
      *
      * Route: PUT /api/profile
      * Middleware: auth:sanctum
@@ -40,14 +39,13 @@ class ProfileController extends Controller
         $user = $request->user();
         $data = $request->validated();
 
-        // If the email changed, reset verification status
+        // If the email changed, keep it verified and skip email verification
         if (isset($data['email']) && $data['email'] !== $user->email) {
-            $data['email_verified_at'] = null;
+            $data['email_verified_at'] = now();
             $user->update($data);
-            $user->sendEmailVerificationNotification();
 
             return response()->json([
-                'message' => 'Profile updated. Please verify your new email address.',
+                'message' => 'Profile updated successfully.',
                 'user'    => UserResource::make($user->fresh()),
             ]);
         }

@@ -19,26 +19,23 @@ class AuthController extends Controller
      *
      * - Creates the user record
      * - Issues a Sanctum API token (Bearer token)
-     * - Sends the email verification notification
      *
      * @return JsonResponse  HTTP 201 with user + token
      */
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
-            'name'     => $request->string('name')->toString(),
-            'email'    => $request->string('email')->toString(),
-            'password' => Hash::make($request->string('password')->toString()),
+            'name'              => $request->string('name')->toString(),
+            'email'             => $request->string('email')->toString(),
+            'password'          => Hash::make($request->string('password')->toString()),
+            'email_verified_at' => now(), // mark verified immediately
         ]);
-
-        // Send email verification notification
-        $user->sendEmailVerificationNotification();
 
         // Issue Sanctum Bearer token
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Registered successfully. Please verify your email.',
+            'message' => 'Registered successfully.',
             'token'   => $token,
             'user'    => UserResource::make($user),
         ], 201);
