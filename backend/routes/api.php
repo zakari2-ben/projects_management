@@ -52,19 +52,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/avatar', [ProfileController::class, 'uploadAvatar']);
     Route::delete('/profile',      [ProfileController::class, 'destroy']);
 
-    // ── Projects & Tasks (Verified Users Only) ──────────────────────────────
-    Route::middleware(['verified'])->group(function () {
-        Route::apiResource('projects', ProjectController::class);
-        Route::post('/projects/join',              [ProjectController::class, 'join']);
-        Route::get('/projects/{project}/users',    [ProjectController::class, 'users']);
+    // ── Projects & Tasks (no email verification required) ────────────────────
+    Route::apiResource('projects', ProjectController::class);
+    Route::post('/projects/join',              [ProjectController::class, 'join']);
+    Route::get('/projects/{project}/users',    [ProjectController::class, 'users']);
 
-        // ── Tasks ─────────────────────────────────────────────────────────────
-        Route::get('/projects/{project}/tasks',                   [TaskController::class, 'index']);
-        Route::post('/projects/{project}/tasks',                  [TaskController::class, 'store']);
-        Route::get('/projects/{project}/tasks/{task}',            [TaskController::class, 'show']);
-        Route::put('/projects/{project}/tasks/{task}',            [TaskController::class, 'update']);
-        Route::delete('/projects/{project}/tasks/{task}',         [TaskController::class, 'destroy']);
-        Route::patch('/projects/{project}/tasks/{task}/status',   [TaskController::class, 'updateStatus']);
-        Route::patch('/projects/{project}/tasks/{task}/assign',   [TaskController::class, 'assign']);
-    });
+    // ── Tasks ────────────────────────────────────────────────────────────────
+    Route::get('/projects/{project}/tasks',                   [TaskController::class, 'index']);
+    Route::post('/projects/{project}/tasks',                  [TaskController::class, 'store']);
+    Route::get('/projects/{project}/tasks/{task}',            [TaskController::class, 'show']);
+    Route::put('/projects/{project}/tasks/{task}',            [TaskController::class, 'update']);
+    Route::delete('/projects/{project}/tasks/{task}',         [TaskController::class, 'destroy']);
+    Route::patch('/projects/{project}/tasks/{task}/status',   [TaskController::class, 'updateStatus']);
+    Route::patch('/projects/{project}/tasks/{task}/assign',   [TaskController::class, 'assign']);
 });
