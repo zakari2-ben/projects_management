@@ -199,7 +199,7 @@ export default function TaskDetailsPage() {
   }
 
   const handleImageUpload = (event) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0] 
     if (!file || !editor) return
 
     const reader = new FileReader()
