@@ -4,16 +4,104 @@
   padding: 1.6rem 1rem 2rem;
 }
 
+.dashboard-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: radial-gradient(circle at 20% 20%, rgba(105, 154, 255, 0.12), transparent 35%),
+              radial-gradient(circle at 80% 0%, rgba(255, 143, 178, 0.16), transparent 45%),
+              linear-gradient(135deg, #0f172a 0%, #111827 35%, #0b1220 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.28);
+  overflow: hidden;
+  min-height: 240px;
+  isolation: isolate;
+}
+
+.dashboard-hero::before,
+.dashboard-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.dashboard-hero::before {
+  backdrop-filter: blur(6px);
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02) 40%, transparent);
+  mix-blend-mode: screen;
+}
+
+.dashboard-hero::after {
+  background: linear-gradient(180deg, rgba(12, 17, 32, 0) 0%, rgba(12, 17, 32, 0.65) 100%);
+  opacity: 0.7;
+}
+
+.dashboard-hero__content {
+  flex: 1;
+  padding: 2.5rem;
+  z-index: 1;
+}
+
+.dashboard-hero__image-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+  max-width: 45%;
+  z-index: 1;
+}
+
+.dashboard-hero__image {
+  width: 100%;
+  height: auto;
+  min-height: 250px;
+  object-fit: contain;
+  object-position: right center;
+  filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.35));
+  transform-origin: center;
+  animation: floatIn 0.9s ease, hoverFloat 8s ease-in-out infinite alternate;
+}
+
+@keyframes floatIn {
+  from { opacity: 0; transform: translateX(24px) scale(0.98); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes hoverFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+
+@media (max-width: 768px) {
+  .dashboard-hero {
+    flex-direction: column;
+    text-align: center;
+    padding-top: 0.8rem;
+  }
+  .dashboard-hero__image-container {
+    max-width: 100%;
+    margin-top: -2rem;
+  }
+  .dashboard-hero__image {
+    min-height: 180px;
+    object-position: center;
+  }
+}
+
 .dashboard-page__title {
   margin: 0;
   font-size: 1.9rem;
   font-weight: 760;
-  color: var(--text-main);
+  color: #f8fafc;
 }
 
 .dashboard-page__subtitle {
   margin: 0.5rem 0 0;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .dashboard-page__kpis {

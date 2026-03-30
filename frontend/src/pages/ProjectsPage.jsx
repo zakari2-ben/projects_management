@@ -2,9 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import EmptyState from '../components/EmptyState'
 import KpiCard from '../components/KpiCard'
-import Modal from '../components/Modal'
 import Navbar from '../components/Navbar'
 import ProjectCard from '../components/ProjectCard'
+import ProjectsHeader from '../components/projects/ProjectsHeader'
+import ProjectsFilters from '../components/projects/ProjectsFilters'
+import CreateProjectModal from '../components/projects/CreateProjectModal'
+import JoinProjectModal from '../components/projects/JoinProjectModal'
 import { useProjects } from '../context/ProjectContext'
 import { getApiErrorDetails } from '../utils/http'
 import '../styles/pages/ProjectsPage.css'
@@ -108,28 +111,7 @@ export default function ProjectsPage() {
     <div className="projects-page">
       <Navbar />
       <main className="projects-page__main">
-        <div className="projects-page__header">
-          <div>
-            <h1 className="projects-page__title">Projects</h1>
-            <p className="projects-page__subtitle">Keep all projects and members aligned in one place.</p>
-          </div>
-          <div className="projects-page__actions">
-            <button
-              type="button"
-              onClick={() => setJoinOpen(true)}
-              className="projects-page__button projects-page__button--secondary"
-            >
-              Join project
-            </button>
-            <button
-              type="button"
-              onClick={() => setCreateOpen(true)}
-              className="projects-page__button projects-page__button--primary"
-            >
-              New project
-            </button>
-          </div>
-        </div>
+        <ProjectsHeader onOpenJoin={() => setJoinOpen(true)} onOpenCreate={() => setCreateOpen(true)} />
 
         <section className="projects-page__kpis">
           <KpiCard label="Total Projects" value={kpis.totalProjects} />
@@ -137,20 +119,7 @@ export default function ProjectsPage() {
           <KpiCard label="Member Slots" value={kpis.totalMembers} />
         </section>
 
-        <section className="projects-page__filters">
-          <input
-            type="search"
-            className="projects-page__input"
-            placeholder="Search by name, invite code, owner..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-          <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="projects-page__input">
-            <option value="recent">Sort: Most recent</option>
-            <option value="name">Sort: Name A-Z</option>
-            <option value="tasks">Sort: Most tasks</option>
-          </select>
-        </section>
+        <ProjectsFilters search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
 
         {loading ? <p className="projects-page__loading">Loading...</p> : null}
 
@@ -174,44 +143,25 @@ export default function ProjectsPage() {
         </div>
       </main>
 
-      <Modal open={isCreateOpen} title="Create project" onClose={() => setCreateOpen(false)}>
-        <form onSubmit={handleCreate} className="projects-page__modal-form">
-          <input
-            type="text"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Project name"
-            className="projects-page__input"
-            required
-          />
-          <textarea
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="Description"
-            className="projects-page__textarea"
-            rows={3}
-          />
-          <button type="submit" disabled={createSubmitting} className="projects-page__modal-submit">
-            {createSubmitting ? 'Creating...' : 'Create'}
-          </button>
-        </form>
-      </Modal>
+      <CreateProjectModal
+        open={isCreateOpen}
+        onClose={() => setCreateOpen(false)}
+        onSubmit={handleCreate}
+        name={name}
+        setName={setName}
+        description={description}
+        setDescription={setDescription}
+        submitting={createSubmitting}
+      />
 
-      <Modal open={isJoinOpen} title="Join project" onClose={() => setJoinOpen(false)}>
-        <form onSubmit={handleJoin} className="projects-page__modal-form">
-          <input
-            type="text"
-            value={inviteCode}
-            onChange={(event) => setInviteCode(event.target.value.toUpperCase())}
-            placeholder="Invite code"
-            className="projects-page__input projects-page__input--uppercase"
-            required
-          />
-          <button type="submit" disabled={joinSubmitting} className="projects-page__modal-submit">
-            {joinSubmitting ? 'Joining...' : 'Join'}
-          </button>
-        </form>
-      </Modal>
+      <JoinProjectModal
+        open={isJoinOpen}
+        onClose={() => setJoinOpen(false)}
+        onSubmit={handleJoin}
+        inviteCode={inviteCode}
+        setInviteCode={setInviteCode}
+        submitting={joinSubmitting}
+      />
     </div>
   )
 }

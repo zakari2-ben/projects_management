@@ -8,6 +8,8 @@ import { useProjects } from '../context/ProjectContext'
 import { getApiErrorDetails } from '../utils/http'
 import '../styles/pages/DashboardPage.css'
 
+const heroImage = `${import.meta.env.BASE_URL}bg_1.png`
+
 export default function DashboardPage() {
   const { user } = useAuth()
   const { projects, fetchProjects } = useProjects()
@@ -39,8 +41,15 @@ export default function DashboardPage() {
     <div className="dashboard-page">
       <Navbar />
       <main className="dashboard-page__main">
-        <h1 className="dashboard-page__title">Hello, {user?.name}</h1>
-        <p className="dashboard-page__subtitle">Manage your projects, priorities, and team execution from one place.</p>
+        <div className="dashboard-hero">
+          <div className="dashboard-hero__content">
+            <h1 className="dashboard-page__title">Hello, {user?.name}</h1>
+            <p className="dashboard-page__subtitle">Manage your projects, priorities, and team execution from one place.</p>
+          </div>
+          <div className="dashboard-hero__image-container">
+            <img src={heroImage} alt="Dashboard Illustration" className="dashboard-hero__image" />
+          </div>
+        </div>
 
         <section className="dashboard-page__kpis">
           <KpiCard label="Projects" value={stats.totalProjects} />
