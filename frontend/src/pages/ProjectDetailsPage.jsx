@@ -13,6 +13,7 @@ import Navbar from '../components/Navbar'
 import ProjectFilters from '../components/project/ProjectFilters'
 import CreateTaskForm from '../components/project/CreateTaskForm'
 import TaskColumns from '../components/project/TaskColumns'
+import TaskGantt from '../components/project/TaskGantt'
 import * as projectsApi from '../api/projects.api'
 import * as tasksApi from '../api/tasks.api'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
@@ -51,6 +52,7 @@ export default function ProjectDetailsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false)
+  const [viewMode, setViewMode] = useState('board')
   const debouncedSearch = useDebouncedValue(search, 280)
 
   const editor = useEditor({
@@ -325,15 +327,40 @@ export default function ProjectDetailsPage() {
           removeSubtask={removeSubtask}
         />
 
-        <TaskColumns
-          columns={columns}
-          groupedTasks={groupedTasks}
-          projectId={id}
-          onQuickMove={quickMove}
-          onDeleteTask={handleDeleteTask}
-          totalTasks={tasks.length}
-          shownTasks={filteredTasks.length}
-        />
+        <div className="project-details-page__view-bar">
+          <div className="project-details-page__view-text">
+            <p className="project-details-page__results">
+              Showing {filteredTasks.length} of {tasks.length} tasks
+            </p>
+            <p className="project-details-page__view-hint">Filters apply to both Board and Gantt views.</p>
+          </div>
+          <div className="project-details-page__view-toggle" role="tablist" aria-label="Task view">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === 'board'}
+              className={`project-details-page__view-tab ${viewMode === 'board' ? 'is-active' : ''}`}
+              onClick={() => setViewMode('board')}
+            >
+              Board
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === 'gantt'}
+              className={`project-details-page__view-tab ${viewMode === 'gantt' ? 'is-active' : ''}`}
+              onClick={() => setViewMode('gantt')}
+            >
+              Gantt
+            </button>
+          </div>
+        </div>
+
+        {viewMode === 'board' ? (
+          <TaskColumns columns={columns} groupedTasks={groupedTasks} projectId={id} onQuickMove={quickMove} onDeleteTask={handleDeleteTask} />
+        ) : (
+          <TaskGantt tasks={filteredTasks} projectId={id} />
+        )}
       </main>
     </div>
   )
