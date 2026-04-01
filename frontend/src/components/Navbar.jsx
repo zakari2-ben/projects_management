@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import NavbarNotifications from './NavbarNotifications'
 import '../styles/components/Navbar.css'
 
 export default function Navbar() {
@@ -28,6 +29,7 @@ export default function Navbar() {
           </NavLink>
         </div>
         <div className="navbar__right">
+          <NavbarNotifications />
           <NavLink to="/profile" className="flex items-center space-x-2 mr-3 hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 rounded-full bg-indigo-100 overflow-hidden border border-indigo-200">
               {user?.avatar_url ? (
