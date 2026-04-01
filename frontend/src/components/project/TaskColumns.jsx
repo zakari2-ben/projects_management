@@ -6,14 +6,9 @@ export default function TaskColumns({
   projectId,
   onQuickMove,
   onDeleteTask,
-  totalTasks,
-  shownTasks,
 }) {
   return (
     <section className="project-details-page__columns">
-      <p className="project-details-page__results">
-        Showing {shownTasks} of {totalTasks} tasks
-      </p>
       {columns.map((column) => (
         <div key={column.key} className="project-details-page__column">
           <h3 className="project-details-page__column-title">{column.title}</h3>
