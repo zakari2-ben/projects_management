@@ -13,15 +13,21 @@ use App\Http\Requests\Task\UpdateTaskStatusRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Models\Task;
+use App\Services\ProjectNotificationService;
 use App\Services\TaskService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use BackedEnum;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class TaskController extends Controller
 {
-    public function __construct(private readonly TaskService $taskService)
+    public function __construct(
+        private readonly TaskService $taskService,
+        private readonly ProjectNotificationService $notificationService
+    )
     {
     }
 
@@ -66,6 +72,13 @@ class TaskController extends Controller
         ]);
 
         $task->load(['assignee', 'creator']);
+        $this->notificationService->notifyProject(
+            $project,
+            $request->user(),
+            'task_created',
+            sprintf('"%s" was created', $task->name),
+            ['task_id' => $task->id]
+        );
 
         return response()->json([
             'message' => 'Task created successfully.',
@@ -85,6 +98,7 @@ class TaskController extends Controller
     {
         $this->ensureTaskBelongsToProject($project, $task);
         $this->authorize('update', $task);
+        $previousName = $task->name;
 
         if ($request->filled('assigned_user_id') && ! $project->isMember((int) $request->assigned_user_id)) {
             throw new HttpException(422, 'Assigned user must be a project member.');
@@ -107,6 +121,13 @@ class TaskController extends Controller
 
         $task->update($validated);
         $task->load(['assignee', 'creator']);
+        $this->notificationService->notifyProject(
+            $project,
+            $request->user(),
+            'task_updated',
+            sprintf('"%s" was updated', $previousName),
+            ['task_id' => $task->id]
+        );
 
         return response()->json([
             'message' => 'Task updated successfully.',
@@ -114,11 +135,19 @@ class TaskController extends Controller
         ]);
     }
 
-    public function destroy(Project $project, Task $task): JsonResponse
+    public function destroy(Request $request, Project $project, Task $task): JsonResponse
     {
         $this->ensureTaskBelongsToProject($project, $task);
         $this->authorize('delete', $task);
+        $taskName = $task->name;
         $task->delete();
+        $this->notificationService->notifyProject(
+            $project,
+            $request->user(),
+            'task_deleted',
+            sprintf('"%s" was deleted', $taskName),
+            ['task_id' => $task->id]
+        );
 
         return response()->json([
             'message' => 'Task deleted successfully.',
@@ -130,9 +159,21 @@ class TaskController extends Controller
         $this->ensureTaskBelongsToProject($project, $task);
         $this->authorize('update', $task);
 
+        $previousStatus = $task->status;
         $task->update([
             'status' => $request->string('status')->toString(),
         ]);
+        if ($previousStatus !== $task->status) {
+            $fromStatus = $previousStatus instanceof BackedEnum ? $previousStatus->value : (string) $previousStatus;
+            $toStatus = $task->status instanceof BackedEnum ? $task->status->value : (string) $task->status;
+            $this->notificationService->notifyProject(
+                $project,
+                $request->user(),
+                'task_moved',
+                sprintf('"%s" moved from %s to %s', $task->name, $fromStatus, $toStatus),
+                ['task_id' => $task->id]
+            );
+        }
 
         return response()->json([
             'message' => 'Task status updated successfully.',

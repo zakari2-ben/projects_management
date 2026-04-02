@@ -13,6 +13,7 @@ import TaskDetailsView from '../components/task/TaskDetailsView'
 import TaskDetailsForm from '../components/task/TaskDetailsForm'
 import * as projectsApi from '../api/projects.api'
 import * as tasksApi from '../api/tasks.api'
+import { useNotifications } from '../context/NotificationContext'
 import {
   getStatusLabel,
   getSubtaskProgress,
@@ -38,7 +39,9 @@ export default function TaskDetailsPage() {
   const taskIdNumber = Number(taskId)
   const location = useLocation()
   const navigate = useNavigate()
+  const { refresh: refreshNotifications } = useNotifications()
   const [task, setTask] = useState(null)
+  const [project, setProject] = useState(null)
   const [projectTasks, setProjectTasks] = useState([])
   const [members, setMembers] = useState([])
   const [name, setName] = useState('')
@@ -83,12 +86,14 @@ export default function TaskDetailsPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [taskData, memberData, taskList] = await Promise.all([
+        const [taskData, memberData, taskList, projectData] = await Promise.all([
           tasksApi.getTask(projectIdNumber, taskIdNumber),
           projectsApi.getProjectMembers(projectIdNumber),
           tasksApi.getTasks(projectIdNumber),
+          projectsApi.getProject(projectIdNumber),
         ])
         setTask(taskData)
+        setProject(projectData)
         setProjectTasks(taskList)
         setMembers(memberData)
         setName(taskData.name)
@@ -108,13 +113,14 @@ export default function TaskDetailsPage() {
           editor.commands.setFontFamily('Segoe UI')
           setEditorFontFamily('Segoe UI')
         }
+        void refreshNotifications()
       } catch (error) {
         toast.error(getApiErrorDetails(error, 'Could not load task').message)
       }
     }
 
     void load()
-  }, [editor, projectIdNumber, taskIdNumber])
+  }, [editor, projectIdNumber, refreshNotifications, taskIdNumber])
 
   const dependencyOptions = useMemo(
     () => projectTasks.filter((projectTask) => projectTask.id !== taskIdNumber),
@@ -163,6 +169,7 @@ export default function TaskDetailsPage() {
       setSubtasks(normalizeSubtasks(updated.subtasks))
       setAssignedUserId(updated.assigned_user_id ? String(updated.assigned_user_id) : '')
       setProjectTasks((prev) => prev.map((item) => (item.id === updated.id ? updated : item)))
+      void refreshNotifications()
 
       if (editor) {
         editor.commands.setContent(nextDescription, { emitUpdate: false })

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\UpdatePasswordRequest;
 use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
+use App\Services\ProjectNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
+    public function __construct(private readonly ProjectNotificationService $notificationService)
+    {
+    }
+
     /**
      * Return the authenticated user's profile.
      *
@@ -43,6 +48,11 @@ class ProfileController extends Controller
         if (isset($data['email']) && $data['email'] !== $user->email) {
             $data['email_verified_at'] = now();
             $user->update($data);
+            $this->notificationService->notifyUserProjects(
+                $user->fresh(),
+                'profile_updated',
+                sprintf('%s updated profile info', $user->name)
+            );
 
             return response()->json([
                 'message' => 'Profile updated successfully.',
@@ -51,6 +61,11 @@ class ProfileController extends Controller
         }
 
         $user->update($data);
+        $this->notificationService->notifyUserProjects(
+            $user->fresh(),
+            'profile_updated',
+            sprintf('%s updated profile info', $user->name)
+        );
 
         return response()->json([
             'message' => 'Profile updated successfully.',

@@ -16,6 +16,7 @@ import TaskColumns from '../components/project/TaskColumns'
 import TaskGantt from '../components/project/TaskGantt'
 import * as projectsApi from '../api/projects.api'
 import * as tasksApi from '../api/tasks.api'
+import { useNotifications } from '../context/NotificationContext'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import {
   normalizeDependencyIds,
@@ -54,6 +55,7 @@ export default function ProjectDetailsPage() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false)
   const [viewMode, setViewMode] = useState('board')
   const debouncedSearch = useDebouncedValue(search, 280)
+  const { refresh: refreshNotifications } = useNotifications()
 
   const editor = useEditor({
     extensions: [
@@ -141,13 +143,14 @@ export default function ProjectDetailsPage() {
         setProject(projectData)
         setMembers(memberData)
         setTasks(taskData)
+        refreshNotifications()
       } catch (error) {
         toast.error(getApiErrorDetails(error, 'Could not load project details').message)
       }
     }
 
     void load()
-  }, [id])
+  }, [id, refreshNotifications])
 
   const handleCreateTask = async (event) => {
     event.preventDefault()
@@ -172,6 +175,7 @@ export default function ProjectDetailsPage() {
 
       const newTask = await tasksApi.createTask(id, payload)
       setTasks((prev) => [newTask, ...prev])
+      refreshNotifications()
       setName('')
       setDescription('')
       setStartDate('')
@@ -195,6 +199,7 @@ export default function ProjectDetailsPage() {
     try {
       const updated = await tasksApi.updateTaskStatus(id, task.id, status)
       setTasks((prev) => prev.map((item) => (item.id === task.id ? updated : item)))
+      refreshNotifications()
     } catch (error) {
       toast.error(getApiErrorDetails(error, 'Could not move task').message)
     }
@@ -207,6 +212,7 @@ export default function ProjectDetailsPage() {
     try {
       await tasksApi.deleteTask(id, task.id)
       setTasks((prev) => prev.filter((item) => item.id !== task.id))
+      refreshNotifications()
       toast.success('Task deleted')
     } catch (error) {
       toast.error(getApiErrorDetails(error, 'Could not delete task').message)
