@@ -2,8 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { getStatusLabel, PRIORITY_LABELS } from '../../utils/taskFields'
 import '../../styles/components/TaskGantt.css'
 
-const DAY_WIDTH = 34
-const ROW_HEIGHT = 64
+const DAY_WIDTHS = {
+  day: 72,
+  week: 52,
+  month: 34,
+}
+const ROW_HEIGHT = 70
 const DAY_MS = 24 * 60 * 60 * 1000
 
 const STATUS_COLORS = {
@@ -76,6 +80,7 @@ export default function TaskGantt({ tasks, projectId }) {
   const storageKey = useMemo(() => (projectId ? `gantt-order-${projectId}` : null), [projectId])
   const today = useMemo(() => startOfDay(new Date()), [])
   const [manualOrder, setManualOrder] = useState([])
+  const [zoom, setZoom] = useState('day')
 
   useEffect(() => {
     if (!storageKey) return
@@ -97,6 +102,7 @@ export default function TaskGantt({ tasks, projectId }) {
         const end = parseDate(task.due_date) || parseDate(task.start_date)
         const safeEnd = start && end ? (end.getTime() < start.getTime() ? start : end) : end
         const hasSchedule = Boolean(start)
+        const durationDays = start && safeEnd ? diffInDays(start, safeEnd) + 1 : null
 
         return {
           ...task,
@@ -106,6 +112,7 @@ export default function TaskGantt({ tasks, projectId }) {
           statusLabel: getStatusLabel(task.status),
           priorityLabel: PRIORITY_LABELS[task.priority] || PRIORITY_LABELS.medium,
           priorityColor: PRIORITY_COLORS[task.priority] || PRIORITY_COLORS.medium,
+          durationLabel: durationDays ? `${durationDays} day${durationDays > 1 ? 's' : ''}` : '',
         }
       }),
     [tasks],
@@ -199,10 +206,15 @@ export default function TaskGantt({ tasks, projectId }) {
       ? diffInDays(timeline.start, today)
       : null
 
-  const totalWidth = days.length * DAY_WIDTH
+  const dayWidth = DAY_WIDTHS[zoom] || DAY_WIDTHS.day
+  const totalWidth = days.length * dayWidth
+  const weekendIndices = useMemo(
+    () => days.map((day, index) => (day.getDay() === 0 || day.getDay() === 6 ? index : null)).filter((i) => i !== null),
+    [days],
+  )
 
   return (
-    <section className="task-gantt" style={{ '--day-width': `${DAY_WIDTH}px`, '--row-height': `${ROW_HEIGHT}px` }}>
+    <section className="task-gantt" style={{ '--day-width': `${dayWidth}px`, '--row-height': `${ROW_HEIGHT}px` }}>
       <div className="task-gantt__legend">
         <div className="task-gantt__legend-group">
           {Object.entries(STATUS_COLORS).map(([status, color]) => (
@@ -212,13 +224,27 @@ export default function TaskGantt({ tasks, projectId }) {
             </span>
           ))}
         </div>
-        <div className="task-gantt__legend-group task-gantt__legend-group--priority">
-          {Object.entries(PRIORITY_COLORS).map(([priority, color]) => (
-            <span key={priority} className="task-gantt__legend-item">
-              <span className="task-gantt__priority-dot" style={{ background: color }} />
-              {PRIORITY_LABELS[priority]}
-            </span>
-          ))}
+        <div className="task-gantt__legend-actions">
+          <div className="task-gantt__legend-group task-gantt__legend-group--priority">
+            {Object.entries(PRIORITY_COLORS).map(([priority, color]) => (
+              <span key={priority} className="task-gantt__legend-item">
+                <span className="task-gantt__priority-dot" style={{ background: color }} />
+                {PRIORITY_LABELS[priority]}
+              </span>
+            ))}
+          </div>
+          <div className="task-gantt__zoom">
+            {['day', 'week', 'month'].map((level) => (
+              <button
+                key={level}
+                type="button"
+                className={`task-gantt__zoom-btn ${zoom === level ? 'is-active' : ''}`}
+                onClick={() => setZoom(level)}
+              >
+                {level.charAt(0).toUpperCase() + level.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -296,13 +322,19 @@ export default function TaskGantt({ tasks, projectId }) {
                 className="task-gantt__day-row"
                 style={{ gridTemplateColumns: `repeat(${days.length}, var(--day-width))` }}
               >
-                {days.map((day, index) => (
-                  <div key={day.toISOString()} className="task-gantt__day">
-                    <span className="task-gantt__day-month">{getMonthLabel(day, index, days)}</span>
-                    <span className="task-gantt__day-number">{day.getDate()}</span>
-                    <span className="task-gantt__day-weekday">{formatWeekday(day)}</span>
-                  </div>
-                ))}
+                {days.map((day, index) => {
+                  const isWeekend = day.getDay() === 0 || day.getDay() === 6
+                  return (
+                    <div
+                      key={day.toISOString()}
+                      className={`task-gantt__day ${isWeekend ? 'task-gantt__day--weekend' : ''}`}
+                    >
+                      <span className="task-gantt__day-month">{getMonthLabel(day, index, days)}</span>
+                      <span className="task-gantt__day-number">{day.getDate()}</span>
+                      <span className="task-gantt__day-weekday">{formatWeekday(day)}</span>
+                    </div>
+                  )
+                })}
               </div>
 
               <div
@@ -312,8 +344,15 @@ export default function TaskGantt({ tasks, projectId }) {
                 }}
               >
                 <div className="task-gantt__grid-lines" />
+                {weekendIndices.map((index) => (
+                  <div
+                    key={`weekend-${index}`}
+                    className="task-gantt__weekend-strip"
+                    style={{ left: `${index * dayWidth}px`, width: `${dayWidth}px` }}
+                  />
+                ))}
                 {todayIndex !== null ? (
-                  <div className="task-gantt__today-line" style={{ left: `${todayIndex * DAY_WIDTH}px` }}>
+                  <div className="task-gantt__today-line" style={{ left: `${todayIndex * dayWidth}px` }}>
                     <span>Today</span>
                   </div>
                 ) : null}
@@ -333,19 +372,19 @@ export default function TaskGantt({ tasks, projectId }) {
                             task.is_overdue ? 'task-gantt__bar--overdue' : ''
                           }`}
                           style={{
-                            left: `${task.offset * DAY_WIDTH}px`,
-                            width: `${task.span * DAY_WIDTH}px`,
+                            left: `${task.offset * dayWidth}px`,
+                            width: `max(${dayWidth * 0.85}px, ${task.span * dayWidth}px)`,
                             '--status-color': STATUS_COLORS[task.status] || STATUS_COLORS.todo,
                             '--priority-color': task.priorityColor,
                           }}
-                          aria-label={`${task.name} (${task.startLabel} → ${task.endLabel})`}
+                          aria-label={`${task.name} (${task.startLabel} -> ${task.endLabel})`}
                         >
                           <span className="task-gantt__bar-title">{task.name}</span>
                           {task.is_overdue ? <span className="task-gantt__bar-tag">Overdue</span> : null}
                           <div className="task-gantt__tooltip">
                             <p className="task-gantt__tooltip-title">{task.name}</p>
                             <p>
-                              <strong>Dates:</strong> {task.startLabel} → {task.endLabel}
+                              <strong>Dates:</strong> {task.startLabel} -> {task.endLabel}
                             </p>
                             <p>
                               <strong>Status:</strong> {task.statusLabel}
