@@ -1,11 +1,13 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import NavbarNotifications from './NavbarNotifications'
 import '../styles/components/Navbar.css'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
+  const { isDark, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -30,17 +32,31 @@ export default function Navbar() {
         </div>
         <div className="navbar__right">
           <NavbarNotifications />
-          <NavLink to="/profile" className="flex items-center space-x-2 mr-3 hover:opacity-80 transition-opacity">
-            <div className="h-8 w-8 rounded-full bg-indigo-100 overflow-hidden border border-indigo-200">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className={`navbar__theme-toggle ${isDark ? 'is-dark' : ''}`}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            <span className="navbar__theme-icon navbar__theme-icon--sun" aria-hidden>
+              ☀️
+            </span>
+            <span className="navbar__theme-icon navbar__theme-icon--moon" aria-hidden>
+              🌙
+            </span>
+          </button>
+          <NavLink to="/profile" className="navbar__profile-link">
+            <div className="navbar__avatar">
               {user?.avatar_url ? (
-                <img src={user.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+                <img src={user.avatar_url} alt="Profile" className="navbar__avatar-image" />
               ) : (
-                <div className="flex items-center justify-center h-full w-full text-indigo-700 font-bold text-sm">
+                <div className="navbar__avatar-fallback">
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
               )}
             </div>
-            <span className="navbar__user font-medium">{user?.name}</span>
+            <span className="navbar__user">{user?.name}</span>
           </NavLink>
           <button type="button" onClick={handleLogout} className="navbar__logout">
             Logout
