@@ -10,8 +10,8 @@
 .page-loader__spinner {
   width: 1rem;
   height: 1rem;
-  border: 2px solid #bfd4fb;
-  border-top-color: #1d4ed8;
+  border: 2px solid var(--accent-border-soft);
+  border-top-color: var(--accent-strong);
   border-radius: 999px;
   animation: page-loader-spin 0.8s linear infinite;
 }
