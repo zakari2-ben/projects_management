@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { updateProfile, updatePassword, uploadAvatar, deleteAccount } from '../api/auth.api'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
+import Navbar from '../components/Navbar'
 import AvatarSection from '../components/profile/AvatarSection'
 import ProfileInfoForm from '../components/profile/ProfileInfoForm'
 import PasswordForm from '../components/profile/PasswordForm'
@@ -104,39 +105,42 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Account Settings</h1>
+        <div>
+            <Navbar />
+            <main className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Account Settings</h1>
 
-            <AvatarSection user={user} avatarLoading={avatarLoading} onUpload={handleAvatarUpload} />
+                <AvatarSection user={user} avatarLoading={avatarLoading} onUpload={handleAvatarUpload} />
 
-            <ProfileInfoForm
-                name={name}
-                setName={setName}
-                email={email}
-                setEmail={setEmail}
-                loading={profileLoading}
-                onSubmit={handleProfileUpdate}
-            />
+                <ProfileInfoForm
+                    name={name}
+                    setName={setName}
+                    email={email}
+                    setEmail={setEmail}
+                    loading={profileLoading}
+                    onSubmit={handleProfileUpdate}
+                />
 
-            <PasswordForm
-                currentPassword={currentPassword}
-                setCurrentPassword={setCurrentPassword}
-                newPassword={newPassword}
-                setNewPassword={setNewPassword}
-                confirmPassword={confirmPassword}
-                setConfirmPassword={setConfirmPassword}
-                loading={passwordLoading}
-                onSubmit={handlePasswordUpdate}
-            />
+                <PasswordForm
+                    currentPassword={currentPassword}
+                    setCurrentPassword={setCurrentPassword}
+                    newPassword={newPassword}
+                    setNewPassword={setNewPassword}
+                    confirmPassword={confirmPassword}
+                    setConfirmPassword={setConfirmPassword}
+                    loading={passwordLoading}
+                    onSubmit={handlePasswordUpdate}
+                />
 
-            <DangerZone
-                showDeleteModal={showDeleteModal}
-                setShowDeleteModal={setShowDeleteModal}
-                deletePassword={deletePassword}
-                setDeletePassword={setDeletePassword}
-                deleteLoading={deleteLoading}
-                onDelete={handleDeleteAccount}
-            />
+                <DangerZone
+                    showDeleteModal={showDeleteModal}
+                    setShowDeleteModal={setShowDeleteModal}
+                    deletePassword={deletePassword}
+                    setDeletePassword={setDeletePassword}
+                    deleteLoading={deleteLoading}
+                    onDelete={handleDeleteAccount}
+                />
+            </main>
         </div>
     )
 }
