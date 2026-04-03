@@ -11,16 +11,16 @@ const ROW_HEIGHT = 70
 const DAY_MS = 24 * 60 * 60 * 1000
 
 const STATUS_COLORS = {
-  todo: '#0ea5e9',
-  in_progress: '#a855f7',
-  done: '#22c55e',
+  todo: 'var(--status-todo)',
+  in_progress: 'var(--status-in-progress)',
+  done: 'var(--status-done)',
 }
 
 const PRIORITY_COLORS = {
-  low: '#94a3b8',
-  medium: '#facc15', // bright amber
-  high: '#f97316', // vivid orange
-  critical: '#dc2626', // strong red
+  low: 'var(--priority-low)',
+  medium: 'var(--priority-medium)',
+  high: 'var(--priority-high)',
+  critical: 'var(--priority-critical)',
 }
 
 function startOfDay(date) {
@@ -79,21 +79,19 @@ function getMonthLabel(day, index, days) {
 export default function TaskGantt({ tasks, projectId }) {
   const storageKey = useMemo(() => (projectId ? `gantt-order-${projectId}` : null), [projectId])
   const today = useMemo(() => startOfDay(new Date()), [])
-  const [manualOrder, setManualOrder] = useState([])
-  const [zoom, setZoom] = useState('day')
-
-  useEffect(() => {
-    if (!storageKey) return
+  const [manualOrder, setManualOrder] = useState(() => {
+    if (!storageKey) return []
     try {
       const saved = localStorage.getItem(storageKey)
-      if (saved) {
-        const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed)) setManualOrder(parsed)
-      }
+      if (!saved) return []
+      const parsed = JSON.parse(saved)
+      return Array.isArray(parsed) ? parsed : []
     } catch (error) {
       console.error('Could not load gantt order', error)
+      return []
     }
-  }, [storageKey])
+  })
+  const [zoom, setZoom] = useState('day')
 
   const normalizedTasks = useMemo(
     () =>
@@ -175,7 +173,7 @@ export default function TaskGantt({ tasks, projectId }) {
     const end = addDays(new Date(Math.max(maxDate.getTime(), today.getTime())), 1)
 
     return { start: startOfDay(start), end: startOfDay(end) }
-  }, [normalizedTasks, today])
+  }, [orderedTasks, today])
 
   const days = useMemo(() => buildDays(timeline.start, timeline.end), [timeline.end, timeline.start])
 
@@ -281,7 +279,9 @@ export default function TaskGantt({ tasks, projectId }) {
                       onClick={() => moveTask(task.id, 'up')}
                       className="task-gantt__reorder-btn"
                     >
-                      ↑
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 5l6 6h-4v8h-4v-8H6l6-6Z" />
+                      </svg>
                     </button>
                     <button
                       type="button"
@@ -289,7 +289,9 @@ export default function TaskGantt({ tasks, projectId }) {
                       onClick={() => moveTask(task.id, 'down')}
                       className="task-gantt__reorder-btn"
                     >
-                      ↓
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 19l-6-6h4V5h4v8h4l-6 6Z" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -384,7 +386,9 @@ export default function TaskGantt({ tasks, projectId }) {
                           <div className="task-gantt__tooltip">
                             <p className="task-gantt__tooltip-title">{task.name}</p>
                             <p>
-                              <strong>Dates:</strong> {task.startLabel} -> {task.endLabel}
+                              <strong>Dates:</strong> {task.startLabel}
+                              {' -> '}
+                              {task.endLabel}
                             </p>
                             <p>
                               <strong>Status:</strong> {task.statusLabel}

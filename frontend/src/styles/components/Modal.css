@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--surface-overlay);
   padding: 1rem;
 }
 
@@ -13,9 +13,10 @@
   width: 100%;
   max-width: 28rem;
   border-radius: 0.95rem;
-  background: #fff;
+  background: var(--surface-elevated);
   padding: 1.25rem;
-  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.24);
+  box-shadow: var(--shadow-floating);
+  border: 1px solid var(--border-soft);
 }
 
 .modal__header {
@@ -34,6 +35,6 @@
 .modal__close {
   border: 0;
   background: transparent;
-  color: #64748b;
+  color: var(--text-subtle);
   cursor: pointer;
 }

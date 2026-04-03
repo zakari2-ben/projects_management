@@ -8,7 +8,7 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-strong);
 }
 
 .task-details-page__header {
@@ -17,9 +17,9 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--surface);
   padding: 0.875rem 1rem;
 }
 
@@ -33,9 +33,9 @@
   margin-top: 1.25rem;
   display: grid;
   gap: 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #f5f7fb;
+  background: var(--surface-muted);
   padding: 1rem;
 }
 
@@ -43,19 +43,20 @@
   margin-top: 1.25rem;
   display: grid;
   gap: 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #f5f7fb;
+  background: var(--surface-muted);
   padding: 1rem;
 }
 
 .task-details-page__input {
   width: 100%;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
   padding: 0.5rem 0.75rem;
   font: inherit;
-  background: #fff;
+  background: var(--surface);
+  color: var(--text-main);
 }
 
 .task-details-page__input--multi {
@@ -65,14 +66,14 @@
 .task-details-page__field-label {
   margin: 0;
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .task-details-page__value {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-main);
 }
 
 .task-details-page__form-sidebar {
@@ -82,9 +83,9 @@
 }
 
 .task-details-page__sidebar-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--surface);
   padding: 0.875rem;
   display: grid;
   gap: 0.75rem;
@@ -100,11 +101,11 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 999px;
-  border: 2px solid #2563eb;
+  border: 2px solid var(--accent);
   display: grid;
   place-items: center;
-  background: #fff;
-  color: #0f172a;
+  background: var(--surface);
+  color: var(--text-strong);
   font-weight: 700;
 }
 
@@ -112,13 +113,13 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-strong);
 }
 
 .task-details-page__sidebar-row {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--surface);
   padding: 0.875rem;
   display: grid;
   gap: 0.5rem;
@@ -137,16 +138,16 @@
 }
 
 .task-details-page__content-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--surface);
   padding: 1rem;
 }
 
 .task-details-page__task-name {
   margin: 0;
   font-size: 1.25rem;
-  color: #0f172a;
+  color: var(--text-strong);
 }
 
 .task-details-page__labels {
@@ -157,10 +158,10 @@
 }
 
 .task-details-page__label-chip {
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--accent-border-soft);
   border-radius: 999px;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
   padding: 0.15rem 0.55rem;
   font-size: 0.75rem;
   font-weight: 600;
@@ -174,7 +175,7 @@
   display: flex;
   justify-content: space-between;
   gap: 0.6rem;
-  color: #334155;
+  color: var(--text-soft);
   font-size: 0.85rem;
 }
 
@@ -182,14 +183,14 @@
   margin-top: 0.35rem;
   height: 0.5rem;
   border-radius: 999px;
-  background: #e2e8f0;
+  background: var(--border-soft);
   overflow: hidden;
 }
 
 .task-details-page__subtask-progress-fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #22c55e, #15803d);
+  background: linear-gradient(90deg, var(--status-done), var(--success));
 }
 
 .task-details-page__subtask-list {
@@ -204,13 +205,13 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #334155;
+  color: var(--text-soft);
   font-size: 0.9rem;
 }
 
 .task-details-page__content {
   margin-top: 0.75rem;
-  color: #334155;
+  color: var(--text-soft);
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
@@ -231,15 +232,15 @@
 
 .task-details-page__content blockquote {
   margin: 0 0 0.75rem;
-  border-left: 3px solid #cbd5e1;
+  border-left: 3px solid var(--border-strong);
   padding-left: 0.75rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .task-details-page__content pre {
   margin: 0 0 0.75rem;
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--surface-inline-code);
+  color: var(--text-inverse);
   border-radius: 0.375rem;
   padding: 0.625rem;
   overflow-x: auto;
@@ -249,15 +250,15 @@
   max-width: 100%;
   height: auto;
   border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
 }
 
 .task-details-page__status-badge {
   width: fit-content;
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--accent-border);
   border-radius: 999px;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
   padding: 0.2rem 0.6rem;
   font-size: 0.75rem;
   font-weight: 600;
@@ -270,26 +271,26 @@
 }
 
 .task-details-page__due--neutral {
-  color: #64748b;
+  color: var(--text-subtle);
 }
 
 .task-details-page__due--good {
-  color: #15803d;
+  color: var(--success);
 }
 
 .task-details-page__due--warn {
-  color: #b45309;
+  color: var(--warning);
 }
 
 .task-details-page__due--danger {
-  color: #be123c;
+  color: var(--danger-strong);
 }
 
 .task-details-page__editor {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.5rem;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface);
 }
 
 .task-details-page__editor-toolbar {
@@ -298,23 +299,23 @@
   flex-wrap: wrap;
   gap: 0.375rem;
   padding: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-subtle);
 }
 
 .task-details-page__toolbar-select {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
   padding: 0.25rem 0.5rem;
   font: inherit;
-  background: #fff;
+  background: var(--surface);
 }
 
 .task-details-page__toolbar-button {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
-  background: #fff;
-  color: #0f172a;
+  background: var(--surface);
+  color: var(--text-strong);
   padding: 0.25rem 0.5rem;
   font-size: 0.8125rem;
   line-height: 1.2;
@@ -322,7 +323,7 @@
 }
 
 .task-details-page__toolbar-button:hover {
-  background: #f8fafc;
+  background: var(--surface-subtle);
 }
 
 .task-details-page__toolbar-upload {
@@ -355,14 +356,14 @@
 
 .task-details-page__editor-content blockquote {
   margin: 0;
-  border-left: 3px solid #cbd5e1;
+  border-left: 3px solid var(--border-strong);
   padding-left: 0.75rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .task-details-page__editor-content pre {
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--surface-inline-code);
+  color: var(--text-inverse);
   border-radius: 0.375rem;
   padding: 0.625rem;
   overflow-x: auto;
@@ -375,9 +376,9 @@
 }
 
 .task-details-page__subtasks-editor {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--surface);
   padding: 0.75rem;
   display: grid;
   gap: 0.5rem;
@@ -405,42 +406,42 @@
 }
 
 .task-details-page__secondary {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
-  background: #fff;
-  color: #334155;
+  background: var(--surface);
+  color: var(--text-soft);
   padding: 0.5rem 0.75rem;
   cursor: pointer;
 }
 
 .task-details-page__secondary:hover {
-  background: #f8fafc;
+  background: var(--surface-subtle);
 }
 
 .task-details-page__save {
   border: 0;
   border-radius: 0.375rem;
-  background: #2563eb;
-  color: #fff;
+  background: var(--accent);
+  color: var(--text-on-brand);
   padding: 0.5rem 0.75rem;
   cursor: pointer;
 }
 
 .task-details-page__save:hover {
-  background: #1d4ed8;
+  background: var(--accent-strong);
 }
 
 .task-details-page__delete {
-  border: 1px solid #fecdd3;
+  border: 1px solid var(--danger-border);
   border-radius: 0.375rem;
-  background: #fff;
-  color: #e11d48;
+  background: var(--surface);
+  color: var(--danger-strong);
   padding: 0.5rem 0.75rem;
   cursor: pointer;
 }
 
 .task-details-page__delete:hover {
-  background: #fff1f2;
+  background: var(--danger-soft);
 }
 
 @media (min-width: 768px) {

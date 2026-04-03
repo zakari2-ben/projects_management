@@ -8,13 +8,11 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: radial-gradient(circle at 20% 20%, rgba(105, 154, 255, 0.12), transparent 35%),
-              radial-gradient(circle at 80% 0%, rgba(255, 143, 178, 0.16), transparent 45%),
-              linear-gradient(135deg, #0f172a 0%, #111827 35%, #0b1220 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--hero-bg);
+  border: 1px solid var(--hero-border);
   border-radius: 1.25rem;
   margin-bottom: 2rem;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.28);
+  box-shadow: var(--hero-shadow);
   overflow: hidden;
   min-height: 240px;
   isolation: isolate;
@@ -30,12 +28,12 @@
 
 .dashboard-hero::before {
   backdrop-filter: blur(6px);
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02) 40%, transparent);
+  background: var(--hero-overlay-top);
   mix-blend-mode: screen;
 }
 
 .dashboard-hero::after {
-  background: linear-gradient(180deg, rgba(12, 17, 32, 0) 0%, rgba(12, 17, 32, 0.65) 100%);
+  background: var(--hero-overlay-bottom);
   opacity: 0.7;
 }
 
@@ -61,7 +59,7 @@
   min-height: 250px;
   object-fit: contain;
   object-position: right center;
-  filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.35));
+  filter: var(--hero-image-shadow);
   transform-origin: center;
   animation: floatIn 0.9s ease, hoverFloat 8s ease-in-out infinite alternate;
 }
@@ -96,12 +94,12 @@
   margin: 0;
   font-size: 1.9rem;
   font-weight: 760;
-  color: #f8fafc;
+  color: var(--hero-title);
 }
 
 .dashboard-page__subtitle {
   margin: 0.5rem 0 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--hero-subtitle);
 }
 
 .dashboard-page__kpis {
@@ -120,10 +118,15 @@
   display: block;
   border-radius: 0.95rem;
   border: 1px solid var(--border-color);
-  background: linear-gradient(160deg, #ffffff 0%, #f4f8ff 100%);
+  background: linear-gradient(160deg, var(--surface) 0%, var(--surface-card-alt) 100%);
   padding: 1.25rem;
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.1);
+  box-shadow: var(--shadow-medium);
   text-decoration: none;
+}
+
+.dashboard-page__card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-floating);
 }
 
 .dashboard-page__card-title {

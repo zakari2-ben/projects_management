@@ -365,7 +365,7 @@ export default function ProjectDetailsPage() {
         {viewMode === 'board' ? (
           <TaskColumns columns={columns} groupedTasks={groupedTasks} projectId={id} onQuickMove={quickMove} onDeleteTask={handleDeleteTask} />
         ) : (
-          <TaskGantt tasks={filteredTasks} projectId={id} />
+          <TaskGantt key={id} tasks={filteredTasks} projectId={id} />
         )}
       </main>
     </div>

@@ -1,9 +1,9 @@
 .kpi-card {
   border: 1px solid var(--border-color);
   border-radius: 14px;
-  background: linear-gradient(150deg, #ffffff 0%, #f4f7ff 100%);
+  background: linear-gradient(150deg, var(--surface) 0%, var(--surface-card-alt) 100%);
   padding: 0.9rem 1rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-soft);
 }
 
 .kpi-card__label {
@@ -22,9 +22,9 @@
 }
 
 .kpi-card--danger .kpi-card__value {
-  color: #b91c1c;
+  color: var(--danger);
 }
 
 .kpi-card--good .kpi-card__value {
-  color: #047857;
+  color: var(--success-strong);
 }

@@ -54,7 +54,6 @@ const TYPE_ICON = {
 export default function NavbarNotifications() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
   const [open, setOpen] = useState(false)
-  const [badgePop, setBadgePop] = useState(false)
   const panelRef = useRef(null)
   const buttonRef = useRef(null)
 
@@ -76,13 +75,6 @@ export default function NavbarNotifications() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [open])
 
-  useEffect(() => {
-    if (unreadCount === 0) return
-    setBadgePop(true)
-    const timer = setTimeout(() => setBadgePop(false), 400)
-    return () => clearTimeout(timer)
-  }, [unreadCount])
-
   const handleMarkOne = (id) => {
     markAsRead(id)
   }
@@ -101,7 +93,7 @@ export default function NavbarNotifications() {
           <path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2Zm7-6V11c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C8.64 5.36 7 7.92 7 11v5L5 18v1h14v-1l-2-2Z" />
         </svg>
         {unreadCount > 0 ? (
-          <span className={`navbar-notifications__badge ${badgePop ? 'is-pop' : ''}`} aria-label={`${unreadCount} unread notifications`}>
+          <span key={unreadCount} className="navbar-notifications__badge" aria-label={`${unreadCount} unread notifications`}>
             {unreadCount}
           </span>
         ) : null}
