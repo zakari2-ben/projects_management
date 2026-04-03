@@ -1,19 +1,27 @@
 .page-loader {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.7rem;
-  color: var(--text-muted);
+  gap: 0.78rem;
+  color: var(--text-soft);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background:
+    radial-gradient(circle at 25% 20%, color-mix(in srgb, var(--brand-soft) 60%, transparent), transparent 40%),
+    radial-gradient(circle at 80% 85%, color-mix(in srgb, var(--accent-soft) 70%, transparent), transparent 48%),
+    transparent;
 }
 
 .page-loader__spinner {
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid var(--accent-border-soft);
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid color-mix(in srgb, var(--accent-border-soft) 80%, transparent);
   border-top-color: var(--accent-strong);
   border-radius: 999px;
   animation: page-loader-spin 0.8s linear infinite;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-soft) 80%, transparent);
 }
 
 @keyframes page-loader-spin {
