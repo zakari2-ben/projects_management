@@ -1,24 +1,42 @@
 .kpi-card {
+  position: relative;
   border: 1px solid var(--border-color);
-  border-radius: 14px;
-  background: linear-gradient(150deg, var(--surface) 0%, var(--surface-card-alt) 100%);
-  padding: 0.9rem 1rem;
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(125deg, color-mix(in srgb, #ffffff 52%, transparent), transparent 48%),
+    linear-gradient(165deg, var(--surface-elevated) 0%, var(--surface-card-alt) 100%);
+  padding: 1rem 1.05rem;
   box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  inset: auto -22% -48% auto;
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--brand) 30%, transparent) 0%, transparent 70%);
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .kpi-card__label {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
+  letter-spacing: 0.11em;
+  color: var(--text-subtle);
+  font-weight: 700;
 }
 
 .kpi-card__value {
   margin: 0.35rem 0 0;
-  font-size: 1.35rem;
+  font-family: var(--font-display);
+  font-size: 1.48rem;
   font-weight: 700;
-  color: var(--text-main);
+  color: var(--text-strong);
 }
 
 .kpi-card--danger .kpi-card__value {
