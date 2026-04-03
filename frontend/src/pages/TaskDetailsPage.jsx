@@ -54,7 +54,7 @@ export default function TaskDetailsPage() {
   const [dependencyIds, setDependencyIds] = useState([])
   const [subtasks, setSubtasks] = useState([])
   const [assignedUserId, setAssignedUserId] = useState('')
-  const [editorFontFamily, setEditorFontFamily] = useState('Segoe UI')
+  const [editorFontFamily, setEditorFontFamily] = useState('Plus Jakarta Sans')
   const [isEditing, setIsEditing] = useState(Boolean(location.state?.editMode))
 
   const editor = useEditor({
@@ -110,8 +110,8 @@ export default function TaskDetailsPage() {
 
         if (editor) {
           editor.commands.setContent(initialDescription, { emitUpdate: false })
-          editor.commands.setFontFamily('Segoe UI')
-          setEditorFontFamily('Segoe UI')
+          editor.commands.setFontFamily('Plus Jakarta Sans')
+          setEditorFontFamily('Plus Jakarta Sans')
         }
         void refreshNotifications()
       } catch (error) {

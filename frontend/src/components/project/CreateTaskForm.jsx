@@ -174,10 +174,10 @@ export default function CreateTaskForm({
                   }}
                   className="project-details-page__toolbar-select"
                 >
-                  <option value="Segoe UI">Segoe UI</option>
+                  <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+                  <option value="Sora">Sora</option>
                   <option value="Arial">Arial</option>
                   <option value="Georgia">Georgia</option>
-                  <option value="Times New Roman">Times New Roman</option>
                   <option value="Courier New">Courier New</option>
                 </select>
                 <button
