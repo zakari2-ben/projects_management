@@ -2,8 +2,8 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  border-bottom: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--navbar-bg);
   backdrop-filter: blur(10px);
 }
 
@@ -38,12 +38,12 @@
 }
 
 .navbar__link:hover {
-  background: #eef5ff;
+  background: var(--surface-hover);
 }
 
 .navbar__link--active {
   color: var(--text-main);
-  background: #dbeafe;
+  background: var(--accent-soft);
 }
 
 .navbar__right {
@@ -52,16 +52,101 @@
   gap: 0.85rem;
 }
 
+.navbar__theme-toggle {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-elevated);
+  color: var(--text-soft);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+}
+
+.navbar__theme-toggle:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow-glow);
+}
+
+.navbar__theme-icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  transition: opacity var(--theme-transition), transform var(--theme-transition);
+}
+
+.navbar__theme-icon--sun {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.navbar__theme-icon--moon {
+  opacity: 0;
+  transform: scale(0.7) rotate(-18deg);
+}
+
+.navbar__theme-toggle.is-dark .navbar__theme-icon--sun {
+  opacity: 0;
+  transform: scale(0.72) rotate(22deg);
+}
+
+.navbar__theme-toggle.is-dark .navbar__theme-icon--moon {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.navbar__profile-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.6rem;
+  text-decoration: none;
+  transition: opacity var(--theme-transition);
+}
+
+.navbar__profile-link:hover {
+  opacity: 0.86;
+}
+
+.navbar__avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--avatar-border);
+  background: var(--avatar-bg);
+}
+
+.navbar__avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.navbar__avatar-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: var(--avatar-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .navbar__user {
   color: var(--text-muted);
   font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .navbar__logout {
   border: 0;
   border-radius: 0.55rem;
   background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
-  color: #fff;
+  color: var(--text-on-brand);
   padding: 0.42rem 0.85rem;
   font-size: 0.875rem;
   cursor: pointer;
