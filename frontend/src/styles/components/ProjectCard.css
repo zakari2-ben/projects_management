@@ -1,15 +1,15 @@
 .project-card {
   border: 1px solid var(--border-color);
   border-radius: 0.95rem;
-  background: linear-gradient(155deg, #ffffff 0%, #f4f8ff 100%);
+  background: linear-gradient(155deg, var(--surface) 0%, var(--surface-card-alt) 100%);
   padding: 1rem;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-soft);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .project-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  box-shadow: var(--shadow-medium);
 }
 
 .project-card__title {
@@ -33,12 +33,12 @@
 }
 
 .project-card__meta span {
-  border: 1px solid #cad8f2;
+  border: 1px solid var(--accent-border-soft);
   border-radius: 999px;
-  background: #ebf2ff;
+  background: var(--surface-tint);
   padding: 0.2rem 0.55rem;
   font-size: 0.74rem;
-  color: #1e3a8a;
+  color: var(--accent-strong);
 }
 
 .project-card__owner {
@@ -49,7 +49,7 @@
 
 .project-card__invite {
   margin-top: 0.45rem;
-  color: #2d4d79;
+  color: var(--text-soft);
   font-size: 0.75rem;
 }
 
@@ -58,7 +58,7 @@
   display: inline-block;
   border-radius: 0.55rem;
   background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
-  color: #fff;
+  color: var(--text-on-brand);
   padding: 0.43rem 0.82rem;
   font-size: 0.875rem;
   font-weight: 500;
