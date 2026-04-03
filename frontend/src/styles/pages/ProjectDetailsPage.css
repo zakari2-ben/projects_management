@@ -13,13 +13,13 @@
 .project-details-page__description {
   margin: 0.25rem 0 0;
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .project-details-page__invite {
   margin: 0.25rem 0 0;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-subtle);
 }
 
 .project-details-page__kpis {
@@ -35,19 +35,19 @@
 }
 
 .project-details-page__clear-filters {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.55rem;
-  background: #fff;
-  color: #334155;
+  background: var(--surface);
+  color: var(--text-soft);
   padding: 0.5rem 0.75rem;
   cursor: pointer;
 }
 
 .project-details-page__create-task {
   margin-top: 1.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #f5f7fb;
+  background: var(--surface-muted);
   padding: 1rem;
 }
 
@@ -60,14 +60,14 @@
 }
 
 .project-details-page__toggle-create {
-  border: 1px solid #2563eb;
-  background: #2563eb;
-  color: #fff;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--text-on-brand);
   border-radius: 0.6rem;
   padding: 0.45rem 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+  box-shadow: var(--shadow-glow);
 }
 
 .project-details-page__section-title {
@@ -85,10 +85,12 @@
 .project-details-page__input,
 .project-details-page__textarea {
   width: 100%;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
   padding: 0.5rem 0.75rem;
   font: inherit;
+  background: var(--surface);
+  color: var(--text-main);
 }
 
 .project-details-page__input--multi {
@@ -98,7 +100,7 @@
 .project-details-page__field-label {
   margin: 0;
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .project-details-page__form-sidebar {
@@ -108,9 +110,9 @@
 }
 
 .project-details-page__sidebar-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--surface);
   padding: 0.875rem;
   display: grid;
   gap: 0.75rem;
@@ -126,11 +128,11 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 999px;
-  border: 2px solid #2563eb;
+  border: 2px solid var(--accent);
   display: grid;
   place-items: center;
-  background: #fff;
-  color: #0f172a;
+  background: var(--surface);
+  color: var(--text-strong);
   font-weight: 700;
 }
 
@@ -138,13 +140,13 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-strong);
 }
 
 .project-details-page__sidebar-row {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--surface);
   padding: 0.875rem;
   display: grid;
   gap: 0.5rem;
@@ -157,10 +159,10 @@
 }
 
 .project-details-page__editor {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.5rem;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface);
 }
 
 .project-details-page__editor-toolbar {
@@ -169,23 +171,23 @@
   flex-wrap: wrap;
   gap: 0.375rem;
   padding: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-subtle);
 }
 
 .project-details-page__toolbar-select {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
   padding: 0.25rem 0.5rem;
   font: inherit;
-  background: #fff;
+  background: var(--surface);
 }
 
 .project-details-page__toolbar-button {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
-  background: #fff;
-  color: #0f172a;
+  background: var(--surface);
+  color: var(--text-strong);
   padding: 0.25rem 0.5rem;
   font-size: 0.8125rem;
   line-height: 1.2;
@@ -193,7 +195,7 @@
 }
 
 .project-details-page__toolbar-button:hover {
-  background: #f8fafc;
+  background: var(--surface-subtle);
 }
 
 .project-details-page__toolbar-upload {
@@ -226,14 +228,14 @@
 
 .project-details-page__editor-content blockquote {
   margin: 0;
-  border-left: 3px solid #cbd5e1;
+  border-left: 3px solid var(--border-strong);
   padding-left: 0.75rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .project-details-page__editor-content pre {
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--surface-inline-code);
+  color: var(--text-inverse);
   border-radius: 0.375rem;
   padding: 0.625rem;
   overflow-x: auto;
@@ -246,9 +248,9 @@
 }
 
 .project-details-page__subtasks {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--surface);
   padding: 0.75rem;
   display: grid;
   gap: 0.5rem;
@@ -262,10 +264,10 @@
 }
 
 .project-details-page__subtask-add {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
-  background: #fff;
-  color: #334155;
+  background: var(--surface);
+  color: var(--text-soft);
   padding: 0.3rem 0.55rem;
   font-size: 0.8rem;
   cursor: pointer;
@@ -273,7 +275,7 @@
 
 .project-details-page__subtasks-empty {
   margin: 0;
-  color: #64748b;
+  color: var(--text-subtle);
   font-size: 0.85rem;
 }
 
@@ -285,10 +287,10 @@
 }
 
 .project-details-page__subtask-remove {
-  border: 1px solid #fecdd3;
+  border: 1px solid var(--danger-border);
   border-radius: 0.375rem;
-  background: #fff;
-  color: #e11d48;
+  background: var(--surface);
+  color: var(--danger-strong);
   padding: 0.4rem 0.55rem;
   cursor: pointer;
 }
@@ -302,8 +304,8 @@
   width: fit-content;
   border: 0;
   border-radius: 0.375rem;
-  background: #2563eb;
-  color: #fff;
+  background: var(--accent);
+  color: var(--text-on-brand);
   padding: 0.5rem 0.75rem;
   cursor: pointer;
 }
@@ -317,15 +319,15 @@
 
 .project-details-page__results {
   margin: 0;
-  color: #475569;
+  color: var(--text-muted);
   font-size: 0.87rem;
 }
 
 .project-details-page__column {
   min-width: 0;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.75rem;
-  background: #e2e8f0;
+  background: var(--border-soft);
   padding: 0.75rem;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -335,7 +337,7 @@
 .project-details-page__column-title {
   margin: 0;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-strong);
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -349,7 +351,7 @@
 
 .project-details-page__column-empty {
   margin: 0;
-  color: #64748b;
+  color: var(--text-subtle);
   font-size: 0.85rem;
 }
 
@@ -361,25 +363,25 @@
 }
 
 .project-details-page__move-button {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 0.375rem;
-  background: #fff;
+  background: var(--surface);
   padding: 0.3rem 0.5rem;
   font-size: 0.75rem;
-  color: #334155;
+  color: var(--text-soft);
   cursor: pointer;
 }
 
 .project-details-page__move-button:hover {
-  background: #f8fafc;
+  background: var(--surface-subtle);
 }
 
 .project-details-page__view-bar {
   margin-top: 1.25rem;
   padding: 0.75rem 0.85rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-soft);
   border-radius: 0.85rem;
-  background: linear-gradient(90deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(90deg, var(--surface-subtle) 0%, var(--surface) 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -395,7 +397,7 @@
 .project-details-page__view-hint {
   margin: 0;
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--text-faint);
 }
 
 .project-details-page__view-toggle {
@@ -404,13 +406,13 @@
   gap: 0.35rem;
   padding: 0.2rem;
   border-radius: 0.75rem;
-  background: #e2e8f0;
+  background: var(--border-soft);
 }
 
 .project-details-page__view-tab {
   border: 1px solid transparent;
   background: transparent;
-  color: #334155;
+  color: var(--text-soft);
   padding: 0.45rem 0.9rem;
   border-radius: 0.65rem;
   cursor: pointer;
@@ -419,15 +421,15 @@
 }
 
 .project-details-page__view-tab.is-active {
-  background: #2563eb;
-  color: #fff;
-  border-color: #1d4ed8;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+  background: var(--accent);
+  color: var(--text-on-brand);
+  border-color: var(--accent-strong);
+  box-shadow: var(--shadow-glow);
 }
 
 .project-details-page__view-tab:not(.is-active):hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: var(--surface-subtle);
+  border-color: var(--border-strong);
 }
 
 @media (min-width: 768px) {
