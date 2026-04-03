@@ -8,6 +8,7 @@ import AvatarSection from '../components/profile/AvatarSection'
 import ProfileInfoForm from '../components/profile/ProfileInfoForm'
 import PasswordForm from '../components/profile/PasswordForm'
 import DangerZone from '../components/profile/DangerZone'
+import '../styles/pages/ProfilePage.css'
 
 export default function ProfilePage() {
     const { user, refreshUser, logout } = useAuth()
@@ -104,43 +105,43 @@ export default function ProfilePage() {
         }
     }
 
-    return (
-        <div>
-            <Navbar />
-            <main className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Account Settings</h1>
+  return (
+    <div className="profile-page">
+      <Navbar />
+      <main className="profile-page__main">
+        <h1 className="profile-page__title">Account Settings</h1>
 
-                <AvatarSection user={user} avatarLoading={avatarLoading} onUpload={handleAvatarUpload} />
+        <AvatarSection user={user} avatarLoading={avatarLoading} onUpload={handleAvatarUpload} />
 
-                <ProfileInfoForm
-                    name={name}
-                    setName={setName}
-                    email={email}
-                    setEmail={setEmail}
-                    loading={profileLoading}
-                    onSubmit={handleProfileUpdate}
-                />
+        <ProfileInfoForm
+          name={name}
+          setName={setName}
+          email={email}
+          setEmail={setEmail}
+          loading={profileLoading}
+          onSubmit={handleProfileUpdate}
+        />
 
-                <PasswordForm
-                    currentPassword={currentPassword}
-                    setCurrentPassword={setCurrentPassword}
-                    newPassword={newPassword}
-                    setNewPassword={setNewPassword}
-                    confirmPassword={confirmPassword}
-                    setConfirmPassword={setConfirmPassword}
-                    loading={passwordLoading}
-                    onSubmit={handlePasswordUpdate}
-                />
+        <PasswordForm
+          currentPassword={currentPassword}
+          setCurrentPassword={setCurrentPassword}
+          newPassword={newPassword}
+          setNewPassword={setNewPassword}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          loading={passwordLoading}
+          onSubmit={handlePasswordUpdate}
+        />
 
-                <DangerZone
-                    showDeleteModal={showDeleteModal}
-                    setShowDeleteModal={setShowDeleteModal}
-                    deletePassword={deletePassword}
-                    setDeletePassword={setDeletePassword}
-                    deleteLoading={deleteLoading}
-                    onDelete={handleDeleteAccount}
-                />
-            </main>
-        </div>
-    )
+        <DangerZone
+          showDeleteModal={showDeleteModal}
+          setShowDeleteModal={setShowDeleteModal}
+          deletePassword={deletePassword}
+          setDeletePassword={setDeletePassword}
+          deleteLoading={deleteLoading}
+          onDelete={handleDeleteAccount}
+        />
+      </main>
+    </div>
+  )
 }
